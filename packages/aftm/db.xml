@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+        xmlns="http://www.concrete5.org/doctrine-xml/0.5"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.concrete5.org/doctrine-xml/0.5 http://concrete5.github.io/doctrine-xml/doctrine-xml-0.5.xsd">
+
+    <table name="aftminvoices">
+        <field name="id" type="integer" size="10">
+            <unsigned/>
+            <autoincrement/>
+            <key/>
+        </field>
+        <field name="invoicenumber" type="string" size="20">
+            <notnull/>
+        </field>
+        <field name="invoicedate" type="datetime">
+            <default value="CURRENT_TIMESTAMP"/>
+            <notnull/>
+        </field>
+        <field name="paid" type="boolean">
+            <default value="0"/>
+            <notnull/>
+        </field>
+        <field name="paiddate" type="datetime">
+            <default value="0000-00-00 00:00:00"/>
+            <notnull/>
+        </field>
+        <field name="paymentmethod" type="string" size="10">
+            <default value="check"/>
+            <notnull/>
+        </field>
+        <field name="paymentreference" type="string" size="30">
+        </field>
+        <field name="customername" type="string" size="254">
+        </field>
+        <field name="customeraddress" type="string" size="512">
+        </field>
+        <field name="customerphone" type="string" size="20">
+        </field>
+        <field name="customeremail" type="string" size="20">
+        </field>
+    </table>
+    <table name="aftminvoiceitems">
+        <field name="id" type="integer" size="10">
+            <unsigned/>
+            <autoincrement/>
+            <key/>
+        </field>
+        <field name="invoiceid" type="integer" size="10">
+        </field>
+        <field name="itemname" type="string" size="254">
+            <notnull/>
+        </field>
+        <field name="itemtype" type="string" size="254">
+        </field>
+        <field name="quantity" type="integer" size="10">
+            <default value="1"/>
+            <notnull/>
+        </field>
+        <field name="amount" type="decimal">
+            <default value="0.00"/>
+            <notnull/>
+        </field>
+    </table>
+    <table name="aftmipnlog">
+        <field name="id" type="integer" size="10">
+            <unsigned/>
+            <autoincrement/>
+            <key/>
+        </field>
+        <field name="date" type="datetime">
+            <default value="CURRENT_TIMESTAMP"/>
+            <notnull/>
+        </field>
+        <field name="formname" type="string" size="20">
+        </field>
+        <field name="invoicenumber" type="string" size="20">
+        </field>
+        <field name="message" type="string" size="512">
+        </field>
+    </table>
+</schema>

@@ -1,0 +1,136 @@
+
+#logo-col {
+  padding-bottom: 5px;
+}
+
+#aftmnav ul {
+  /*
+  div.ccm-page header nav ul {
+  if more specific needed:
+  div.ccm-responsive-navigation original ul { */
+  float: left;
+}
+
+
+/* div.ccm-page header nav ul a { */
+#aftmnav ul a {
+  color: #496C81;
+}
+/* div.ccm-page header nav ul a:hover { */
+#aftmnav ul a:hover {
+  color: #0786FF;
+}
+
+#small-menu {
+  font-size: 12px;
+  padding-top: 5px;
+}
+
+div.ccm-page header {
+  padding-bottom: 5px;
+}
+
+footer#concrete5-brand {
+  background-color: #dce1e4;
+}
+.ccm-search-block-text {
+  height: 32px;
+  color: black !important;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+#aftm-mobile-menu {
+  display: none;
+
+  /*
+  position: absolute;
+  z-index: 99;
+  top: 120px;
+  left: 0px;
+*/
+  border-bottom: 5px solid @header-site-title-type-color;
+  width: 100%;
+  padding-top: 0px;
+  padding-left: 0px;
+  background-color: white;
+  -webkit-text-size-adjust: none;
+  ul {
+    padding-left: 0;
+    width: 90%;
+    background-color: white;
+    li {
+      list-style-type: none;
+      &.parent-ul {
+        a {
+          &:after {
+            padding-left: 7px;
+            padding-top: 3px;
+            font-size: 20px;
+            content: "\f107";
+            font-family: FontAwesome;
+            font-weight: normal;
+            font-style: normal;
+            display: inline-block;
+            cursor: pointer;
+            text-decoration: inherit;
+          }
+        }
+      }
+      a {
+        &:hover {
+          color: #0786FF;
+        }
+        color: #496C81;
+        font-size: 18px;
+        display: inline-block;
+        /* width: 80%; */
+        padding: 7px 5% 7px 0px;
+        margin: 0% 5% 0% 0;
+        padding-left: 15px;
+        height: 100%;
+        font-weight: normal;
+        text-decoration: none;
+      }
+      ul {
+        li {
+          &.last-li {
+            a{
+              padding-top: 0px;
+              font-size: 15px;
+              &:after {
+                content: '';
+              }
+            }
+          }
+          padding-left: 10px;
+        }
+      }
+      display: block;
+    }
+  }
+}
+
+@media all and (min-width: @screen-xs-max) {
+  #aftm-mobile-menu {
+    display: none !important;
+  }
+}
+
+#aftm-front-pageheader {
+  padding-top: 10px;
+  /*
+  min-height: 457px;
+   */
+}
+
+legend {
+  color: #d1875a;
+  font-weight: bold;
+}
+
+.required-field {
+  color: red;
+  padding-left: 10px;
+  content: '*';
+}

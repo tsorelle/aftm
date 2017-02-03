@@ -1,0 +1,44 @@
+Changes from Elemental theme:  0.9.3
+
+Directory changes:
+    packages/cloneamental = packages/aftm
+    packages/cloneamental/themes/cloneamental = packages/cloneamental/themes/aftm
+    added folder packages/aftm/images
+        aftm-header.png
+        paint.net source files (*.pdn) in design/site-images
+    packages\aftm\themes\aftm\blocks
+        added auto-nav template (may not need)
+
+Added files:
+    packages/aftm/themes/aftm/css/presets/aftm.less
+    packages/aftm/themes/aftm/css/build/aftm/aftm-styles.less
+
+Updated files:
+    packages\aftm\controller.php
+        changed package name and description etc
+    packages\aftm\themes\aftm\page_theme.php
+        changed package name etc
+    packages/aftm/themes/aftm/css/main.less
+        include aftm-styles.less
+    packages\aftm\themes\aftm\elements\header_top.php
+            // replace bootstrap-modified.css link with cdn
+            Rolled back - do not modify
+    packages\aftm\themes\aftm\page_theme.php
+        after: $this->providesAsset('css', 'bootstrap/*');
+        add: $this->requireAsset('javascript', 'bootstrap/collapse');
+    packages\aftm\themes\aftm\elements\header.php
+        major redesign of header area
+
+
+
+
+
+
+
+
+
+
+
+
+
+

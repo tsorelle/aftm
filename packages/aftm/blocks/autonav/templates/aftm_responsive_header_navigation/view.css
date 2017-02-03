@@ -1,0 +1,9 @@
+.ccm-responsive-overlay {
+    display: none;
+}
+#aftm-menu-launch {
+}
+#aftm-mobile-menu {
+    display: none;
+    background-color: white; !important;
+}
