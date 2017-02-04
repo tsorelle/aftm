@@ -193,16 +193,6 @@ class AftmMemberForm extends AbstractController
     }
 
     /**
-     * Get unique invoice number
-     *
-     * @return string
-     */
-    private function createInvoiceId() {
-        // todo: implement improved createInvoiceId
-        return uniqid();
-    }
-
-    /**
      * Validate form values.
      *
      * @param $formData

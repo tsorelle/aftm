@@ -32,15 +32,16 @@ use Concrete\Core\Express\EntryList;
 abstract class IpnControllerBase extends Controller
 {
     private $invoicenumber = 'unknown';
-    private $ipndebug = false;
-    const debugVerbose = 'verbose';
-    const debugPhpLog = 'phplog';
-    const debugLocal = 'local';
+    private $ipndebug = false;  // log messages except verbose
+    const debugVerbose = 'verbose'; // log verbose messages
+    const debugPhpLog = 'phplog'; // log to php error log
+    const debugLocal = 'local'; // write messages to html response
+    const debugDump = 'dump';  // log post values to database
 
     private function writeLog($message,$debugmode = false) {
         if ($this->ipndebug == self::debugLocal) {
             echo "<p>$message</p>";
-            // return;
+            return;
         }
 
         if ($debugmode === self::debugVerbose && $this->ipndebug !== self::debugVerbose ) {
@@ -58,7 +59,7 @@ abstract class IpnControllerBase extends Controller
             $db = \Database::connection();
             $db->insert('aftmipnlog', array(
                 'formname' => $this->getFormId(),
-                'invoicenumber' => $this->invoicenumber,
+                'invoicenumber' => $this->invoice,
                 'message' => $message
             ));
         } catch (Exception $e) {
@@ -123,7 +124,7 @@ abstract class IpnControllerBase extends Controller
             $curl_url = 'https://www.paypal.com/cgi-bin/webscr';
         }
 
-        if ($this->ipndebug = self::debugLocal) {
+        if ($this->ipndebug == self::debugLocal) {
             return true;
         }
 
@@ -185,6 +186,10 @@ abstract class IpnControllerBase extends Controller
         return $value;
     }
 
+    private function dumpPostVars() {
+
+    }
+
     /**
      * @return \stdClass
      *
@@ -226,8 +231,9 @@ abstract class IpnControllerBase extends Controller
      *
      */
     public function handleResponse() {
-        $configSection = $this->getFormId().'-form';
-        $this->ipndebug = (!empty(AftmConfiguration::getValue('ipndebug',$configSection,false)));
+        $configSection = 'form-'.$this->getFormId();
+        // $this->ipndebug = (!empty(AftmConfiguration::getValue('ipndebug',$configSection,false)));
+        $this->ipndebug = AftmConfiguration::getValue('ipndebug',$configSection,false);
         $request = Request::getInstance();
         $sandboxMode = $request->get('sandbox');
         $formId = $this->getFormId();
@@ -240,35 +246,46 @@ abstract class IpnControllerBase extends Controller
             $this->writeLog('IPN ERROR: Cannot verify paypal request');
             return;
         }
-        
+
         $this->writeLog("IPN listener request VERIFIED",self::debugVerbose);
 
+        if ($this->ipndebug == self::debugDump) {
+            foreach ($_POST as $key => $value ) {
+                $this->writeLog("post: $key = $value");
+            }
+        }
         $inputs = $this->getPostValues();
 
         $this->checkForFraud($inputs);
 
-        if (empty($inputs->invoicenumber)) {
+        if (empty($inputs->invoice)) {
             $this->writeLog('IPN ERROR: No invoice number in IPN request.');
             return;
         }
-        $this->invoicenumber = $inputs->invoicenumber;
+        $this->invoice = $inputs->invoice;
 
         $params = new \stdClass();
         $params->request = $inputs;
-        $count = AftmInvoiceManager::Update($inputs->invoicenumber);
+
+        if ($this->ipndebug == self::debugDump) {
+            $this->writeLog("IPN listener test coupleted.  Form:'$formId', Invoice number: '$inputs->invoice'");
+            return;
+        }
+
+        $count = AftmInvoiceManager::Update($inputs->invoice);
         if ($count > 0) {
-            $params->invoice = AftmInvoiceManager::Get($inputs->invoicenumber);
-            $params->details = $this->getDetails($inputs->invoicenumber);
+            $params->invoice = AftmInvoiceManager::Get($inputs->invoice);
+            $params->details = $this->getDetails($inputs->invoice);
         }
         else {
             $params->invoice = false;
             $params->details = false;
-            $this->writeLog("IPN warning: Invoice #$inputs->invoicenumber not found.");
+            $this->writeLog("IPN warning: Invoice #$inputs->invoice not found.");
         }
 
         $this->sendNotifications($params);
         $this->updateData($params);
 
-        $this->writeLog("IPN listener coupleted.  Form:'$formId', Invoice number: '$inputs->invoicenumber'");
+        $this->writeLog("IPN listener coupleted.  Form:'$formId', Invoice number: '$inputs->invoice'");
     }
 }
