@@ -109,14 +109,14 @@ class AftmMemberForm extends AbstractController
      * See \application\src\aftm\config.ini [form-member] for hosted button id numbers and other values
      *
      * @param $memberType  - Must be one of the values defined in the hosted form on paypal
-     * @param $invoiceId - passed to paypal as unique invoice identifier
+     * @param $invoicenumber - passed to paypal as unique invoice identifier
      * @param $customValue - passed to paypal as custom id value for member
      */
-    private function getPayPalForm($memberType,$invoiceId,$customValue) {
+    private function getPayPalForm($memberType,$invoicenumber,$customValue) {
         $form = PayPalForm::CreateStoredForm('member');
         // $form->setIpnListner();
         $form->setSelectedItem('Membership Type',$memberType);
-        $form->setInvoiceId($invoiceId);
+        $form->setInvoiceNumber($invoicenumber);
         $form->setCustomValue($customValue);
         $form->setReturnUrl();
         $results = $form->getMarkup(); // with 'autolaunch' immediate redirect to PayPal
@@ -255,13 +255,13 @@ class AftmMemberForm extends AbstractController
             }
 
             $formData->cost = $this->getCost($formData->membership_type);
-            $formData->invoiceId = $this->postInvoice($formData);
+            $formData->invoicenumber = $this->postInvoice($formData);
             AftmMemberEntityManager::AddMembership($formData);
 
             if ($formData->payment_method == 'paypal') {
                 $this->set('activepanel','paypal');
                 $this->getPayPalForm(
-                    $formData->membership_type, $formData->invoiceId, $formData->memberId
+                    $formData->membership_type, $formData->invoicenumber, $formData->memberId
                 );
             }
             else {

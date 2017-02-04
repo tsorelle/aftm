@@ -46,7 +46,11 @@ class AftmInvoiceManager
             $item['invoiceid'] = $id;
             $db->insert('aftminvoiceitems', $item);
         }
-        return $id;
+
+        $invoicenumber = sprintf('%08d', $id);
+        $count = $db->executeUpdate('UPDATE aftminvoices SET  invoicenumber=? WHERE id = ?', array($invoicenumber,$id));
+
+        return $invoicenumber;
     }
 
     public function updateInvoice($invoicenumber) {
@@ -97,8 +101,7 @@ class AftmInvoiceManager
      * @return string
      */
     public static function Post($invoiceData,$invoiceItems) {
-        $id = self::getInstance()->postInvoice($invoiceData,$invoiceItems);
-        return sprintf('%08d', $id);
+        return self::getInstance()->postInvoice($invoiceData,$invoiceItems);
     }
 
     public static function Update($invoicenumber) {

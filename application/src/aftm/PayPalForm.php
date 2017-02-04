@@ -189,7 +189,7 @@ class PayPalForm
      *
      * @param $id
      */
-    public function setInvoiceId($id) {
+    public function setInvoiceNumber($id) {
         $this->addHiddenField('invoice',$id);
     }
 
