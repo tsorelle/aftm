@@ -37,7 +37,9 @@
         </field>
         <field name="customerphone" type="string" size="20">
         </field>
-        <field name="customeremail" type="string" size="20">
+        <field name="customeremail" type="string" size="120">
+        </field>
+        <field name="paypaltxnid" type="string" size="20">
         </field>
     </table>
     <table name="aftminvoiceitems">

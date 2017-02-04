@@ -53,10 +53,11 @@ class AftmInvoiceManager
         return $invoicenumber;
     }
 
-    public function updateInvoice($invoicenumber) {
+    public function updateInvoice($invoicenumber,$transactionId='') {
         $db = \Database::connection();
         $today = date('Y-m-d');
-        $count = $db->executeUpdate('UPDATE aftminvoices SET paid = 1, paiddate=? WHERE invoicenumber = ?', array($today,$invoicenumber));
+        $count = $db->executeUpdate('UPDATE aftminvoices SET paid = 1, paiddate=?, paypaltxnid = ? WHERE invoicenumber = ?',
+            array($today,$transactionId,$invoicenumber));
         return $count;
     }
 
@@ -91,6 +92,13 @@ class AftmInvoiceManager
         return $result;
     }
 
+    public function checkPaypalTransactionId($transactionId) {
+        $db = \Database::connection();
+        $statement = $db->executeQuery('SELECT 1 FROM aftminvoices WHERE paypaltxnid = ?', array($transactionId));
+        $result = $statement->fetch();
+        return  ($result !== false);
+    }
+
     /**
      * Singleton method
      * Add invoice and items to database
@@ -104,11 +112,15 @@ class AftmInvoiceManager
         return self::getInstance()->postInvoice($invoiceData,$invoiceItems);
     }
 
-    public static function Update($invoicenumber) {
-        self::getInstance()->updateInvoice($invoicenumber);
+    public static function Update($invoicenumber,$transactionId='') {
+        return self::getInstance()->updateInvoice($invoicenumber,$transactionId);
     }
 
     public static function Get($invoicenumber) {
         return self::getInstance()->GetInvoice($invoicenumber);
+    }
+
+    public static function CheckPaypalTransaction($transactionId) {
+        return self::getInstance()->checkPaypalTransactionId($transactionId);
     }
 }

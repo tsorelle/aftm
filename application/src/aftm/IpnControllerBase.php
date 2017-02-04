@@ -176,10 +176,6 @@ abstract class IpnControllerBase extends Controller
 
     }
 
-    private function checkForFraud($inputs) {
-
-    }
-
     protected function getPostValue($key)
     {
         $value = isset($_POST[$key]) ? $_POST[$key] : '';
@@ -228,17 +224,79 @@ abstract class IpnControllerBase extends Controller
     abstract function getFormId();
 
     /**
+     * Validate the paypal transaction 
+     * See: https://developer.paypal.com/docs/classic/ipn/integration-guide/IPNIntro/#id08CKFJ00JYK
+     * 
+     * @param $sandboxMode
+     * @return bool
+     */
+    private function authenticatePaypalTransaction($sandboxMode)
+    {
+        $paymentStatus = $this->getPostValue('payment_status');
+        if ($paymentStatus !== 'Completed') {
+            $this->writeLog("Paypal incomplete payment status '$paymentStatus'",self::debugVerbose);
+            return false;
+        }
+        $receiver  = $this->getPostValue('receiver_email');
+        $key = $sandboxMode ? 'sandboxemail' : 'accountemail';
+        $expectedReceiver = AftmConfiguration::getValue($key,'paypal');
+        if (empty($expectedReceiver)) {
+            $this->writeLog('Reciever email not found in config.');
+            return false;
+        }
+        if (strcasecmp($expectedReceiver,$receiver) !== 0) {
+            $this->writeLog('IPN ERROR: Unknown receiver email '.$receiver);
+            return false;
+        }
+        $txnid = $this->getPostValue('txn_id');
+        if (AftmInvoiceManager::CheckPaypalTransaction($txnid)) {
+            $this->writeLog("Paypal duplicate transaction '$txnid' for invoice '$this->invoice'");
+            return false;
+        }
+
+        return $txnid;
+    }
+    
+    private function updateInvoice($transactionId) {
+        $invoice = new \stdClass();
+        $count = AftmInvoiceManager::Update($this->invoice,$transactionId);
+        if ($count > 0) {
+            $invoice->invoice = AftmInvoiceManager::Get($this->invoice);
+            $invoice->details = $this->getDetails($this->invoice);
+        }
+        else {
+            $invoice->invoice = false;
+            $invoice->details = false;
+            $this->writeLog("IPN warning: Invoice #$this->invoice not found.");
+        }
+
+        return $invoice;
+
+    }
+
+    /**
      *
      */
     public function handleResponse() {
         $configSection = 'form-'.$this->getFormId();
-        // $this->ipndebug = (!empty(AftmConfiguration::getValue('ipndebug',$configSection,false)));
         $this->ipndebug = AftmConfiguration::getValue('ipndebug',$configSection,false);
         $request = Request::getInstance();
         $sandboxMode = $request->get('sandbox');
         $formId = $this->getFormId();
 
-        // logging for debug - terry sorelle aftm.us
+        $invoiceNumber = $this->getPostValue('invoice');
+        if (empty($invoiceNumber)) {
+            $this->writeLog('IPN ERROR: No invoice number in IPN request.',self::debugVerbose);
+            return;
+        }
+        $this->invoice = $invoiceNumber;
+        $transactionId = $this->authenticatePaypalTransaction($sandboxMode); 
+        if ($transactionId === false) {
+            return;
+        }
+
+        $inputs = $this->getPostValues();
+
         $this->writeLog("IPN Listener for $formId recieved message");
         $this->writeLog("Sandbox: ". ($sandboxMode? 'yes':'no'), self::debugVerbose);
 
@@ -257,38 +315,18 @@ abstract class IpnControllerBase extends Controller
                 $this->writeLog("post: $key = $value");
             }
         }
-        $inputs = $this->getPostValues();
-
-        $this->checkForFraud($inputs);
-
-        if (empty($inputs->invoice)) {
-            $this->writeLog('IPN ERROR: No invoice number in IPN request.');
-            return;
-        }
-        $this->invoice = $inputs->invoice;
-
-        $params = new \stdClass();
-        $params->request = $inputs;
 
         if ($this->ipndebug == self::debugDump) {
-            $this->writeLog("IPN listener test coupleted.  Form:'$formId', Invoice number: '$inputs->invoice'");
+            $this->writeLog("IPN listener test completed.  Form:'$formId', Invoice number: '$this->invoice'");
             return;
         }
 
-        $count = AftmInvoiceManager::Update($inputs->invoice);
-        if ($count > 0) {
-            $params->invoice = AftmInvoiceManager::Get($inputs->invoice);
-            $params->details = $this->getDetails($inputs->invoice);
-        }
-        else {
-            $params->invoice = false;
-            $params->details = false;
-            $this->writeLog("IPN warning: Invoice #$inputs->invoice not found.");
-        }
+        $params = $this->updateInvoice($transactionId);
+        $params->request = $inputs;
 
         $this->sendNotifications($params);
         $this->updateData($params);
 
-        $this->writeLog("IPN listener coupleted.  Form:'$formId', Invoice number: '$inputs->invoice'");
+        $this->writeLog("IPN listener coupleted.  Form:'$formId', Invoice number: '$this->invoice'");
     }
 }
