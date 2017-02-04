@@ -160,10 +160,6 @@ class PayPalForm
      * @see https://developer.paypal.com/webapps/developer/docs/classic/products/instant-payment-notification/
      */
     public function setIpnListner($listener='') {
-        $enabled = AftmConfiguration::getValue('ipnenabled',false);
-        if (!$enabled) {
-            return;
-        }
         if (empty($listener)) {
             $listener = $this->formId.'/ipn';
         }
