@@ -163,18 +163,19 @@ class PayPalForm
         if (empty($listener)) {
             $listener = $this->formId.'/ipn';
         }
-        $ipnProtocol = AftmConfiguration::getValue('paypal','ipnprotocol','http:');
+        $ipnProtocol = AftmConfiguration::getValue('paypal','ipnprotocol','http');
         $ipnPrefix = AftmConfiguration::getValue('paypal','ipnprefix','aftm/paypal');
         $url =  $ipnProtocol."://".$_SERVER["SERVER_NAME"];
         if ($_SERVER["SERVER_PORT"] != "80") {
             $url .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"];
         }
-        $url .= '/'.$ipnPrefix.'.'.$listener."/".$this->sandboxMode;
+        $url .= '/'.$ipnPrefix."/".$listener."/".$this->sandboxMode;
         $this->ipnUrl = $url;
     }
 
     /**
-     * Add hidden field for a custom value. Usually a select list item
+     * Add hidden field for a custom select list value.
+     * Used for product lookup, eg membership type
      *
      * @param $name
      * @param $value
@@ -194,7 +195,7 @@ class PayPalForm
     }
 
     /**
-     * Add a custom value, e.g. a membership id
+     * Add a custom value, e.g. a membership name
      *
      * @param $value
      */

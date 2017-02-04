@@ -128,15 +128,15 @@ abstract class IpnControllerBase extends Controller
             return true;
         }
 
-        $ch = curl_init($curl_url);
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $verificationRequest);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: XXXXXXXXXXXXXXXX', 'Connection: Close'));
+        $ch = \curl_init($curl_url);
+        \curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        \curl_setopt($ch, CURLOPT_POST, 1);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        \curl_setopt($ch, CURLOPT_POSTFIELDS, $verificationRequest);
+        \curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+        \curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        \curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+        \curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: XXXXXXXXXXXXXXXX', 'Connection: Close'));
 
         // In wamp like environments that do not come bundled with root authority certificates,
         // please download 'cacert.pem' from "http://curl.haxx.se/docs/caextract.html" and set the directory path
@@ -144,10 +144,10 @@ abstract class IpnControllerBase extends Controller
         // curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__) . '/cacert.pem');
         if( !($res = curl_exec($ch)) ) {
             // error_log("Got " . curl_error($ch) . " when processing IPN data");
-            curl_close($ch);
+            \curl_close($ch);
             exit;
         }
-        curl_close($ch);
+        \curl_close($ch);
         return (strcmp ($res, "VERIFIED") == 0);
     }
     
@@ -242,9 +242,12 @@ abstract class IpnControllerBase extends Controller
         $this->writeLog("IPN Listener for $formId recieved message");
         $this->writeLog("Sandbox: ". ($sandboxMode? 'yes':'no'), self::debugVerbose);
 
-        if (!$this->verifyPayPalRequest($sandboxMode)) {
-            $this->writeLog('IPN ERROR: Cannot verify paypal request');
-            return;
+        $verify = AftmConfiguration::getValue('ipnverify',$configSection,false);
+        if (!empty($verify)) {
+            if (!$this->verifyPayPalRequest($sandboxMode)) {
+                $this->writeLog('IPN ERROR: Cannot verify paypal request');
+                return;
+            }
         }
 
         $this->writeLog("IPN listener request VERIFIED",self::debugVerbose);
