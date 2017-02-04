@@ -114,7 +114,7 @@ class AftmMemberForm extends AbstractController
      */
     private function getPayPalForm($memberType,$invoicenumber,$customValue) {
         $form = PayPalForm::CreateStoredForm('member');
-        // $form->setIpnListner();
+        $form->setIpnListner();
         $form->setSelectedItem('Membership Type',$memberType);
         $form->setInvoiceNumber($invoicenumber);
         $form->setCustomValue($customValue);
