@@ -85,6 +85,16 @@ class PayPalForm
         $this->sandboxMode = $value;
     }
 
+    private function customValuesToString() {
+        $result = '';
+        if (!empty($this->customValues)) {
+            foreach ($this->customValues as $name => $value) {
+                $result .=(empty($result)? '':';')."$name=$value";
+            }
+        }
+        return $result;
+    }
+
     /**
      * Build form markup. Call this only after all hidden fields are added and non-default values are set.
      *
@@ -101,7 +111,10 @@ class PayPalForm
         if (!empty($this->ipnUrl)) {
             $this->addHiddenField("notify_url",$this->ipnUrl);
         }
-
+        $custom = $this->customValuesToString();
+        if (!empty($custom)) {
+            $this->addHiddenField('custom', $custom);
+        }
 
         $imgsrc = AftmConfiguration::getValue('site','imgsrc','/packages/aftm/images');
 
@@ -194,13 +207,17 @@ class PayPalForm
         $this->addHiddenField('invoice',$id);
     }
 
+
+    private $customValues = array();
+
     /**
      * Add a custom value, e.g. a membership name
      *
      * @param $value
      */
-    public function setCustomValue($value) {
-        $this->addHiddenField('custom',$value);
+    public function addCustomValue($name, $value) {
+        $this->customValues[$name] = $value;
+        // $this->addHiddenField('custom',$value);
     }
 
     /**

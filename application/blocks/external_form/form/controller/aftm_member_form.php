@@ -112,16 +112,17 @@ class AftmMemberForm extends AbstractController
      * @param $invoicenumber - passed to paypal as unique invoice identifier
      * @param $customValue - passed to paypal as custom id value for member
      */
-    private function getPayPalForm($memberType,$invoicenumber,$customValue) {
+    private function getPayPalForm($memberType,$invoicenumber,$memberName) {
         $form = PayPalForm::CreateStoredForm('member');
         $ipnenabled = AftmConfiguration::getValue('ipnenabled','form-member',false);
         if ($ipnenabled) {
             $form->setIpnListner();
         }
-
+        $form->addCustomValue("formid",'member');
+        $form->addCustomValue("membername",$memberName);
         $form->setSelectedItem('Membership Type',$memberType);
         $form->setInvoiceNumber($invoicenumber);
-        $form->setCustomValue($customValue);
+        // $form->setCustomValue($customValue);
         $form->setReturnUrl();
         $autolaunch = AftmConfiguration::getValue('paypalredirect','form-member',true);
         $results = $form->getMarkup($autolaunch); // with 'autolaunch' immediate redirect to PayPal
@@ -262,11 +263,12 @@ class AftmMemberForm extends AbstractController
             $formData->invoicenumber = $this->postInvoice($formData);
             AftmMemberEntityManager::AddMembership($formData);
 
-            $formData->memberId = $formData->member_first_name.' '.$formData->member_last_name;
+            $memberName = $formData->member_first_name.' '.$formData->member_last_name;
+            $formData->memberId = $memberName;
             if ($formData->payment_method == 'paypal') {
                 $this->set('activepanel','paypal');
                 $this->getPayPalForm(
-                    $formData->membership_type, $formData->invoicenumber, $formData->memberId
+                    $formData->membership_type, $formData->invoicenumber, $memberName
                 );
             }
             else {

@@ -274,6 +274,19 @@ abstract class IpnControllerBase extends Controller
 
     }
 
+    protected function customValuesToArray() {
+        $result = array();
+        $values = $this->getPostValue('custom');
+        $lines = explode(';',$values);
+        foreach ($lines as $line) {
+            $parts = explode('=',$line);
+            $name = $parts[0];
+            $value = (sizeof($parts) > 1 ? $parts[1] : '');
+            $result[$name] = $value;
+        }
+        return $result;
+    }
+
     /**
      *
      */
@@ -295,7 +308,6 @@ abstract class IpnControllerBase extends Controller
             return;
         }
 
-        $inputs = $this->getPostValues();
 
         $this->writeLog("IPN Listener for $formId recieved message");
         $this->writeLog("Sandbox: ". ($sandboxMode? 'yes':'no'), self::debugVerbose);
@@ -322,8 +334,7 @@ abstract class IpnControllerBase extends Controller
         }
 
         $params = $this->updateInvoice($transactionId);
-        $params->request = $inputs;
-
+        $params->request = $this->getPostValues();
         $this->sendNotifications($params);
         $this->updateData($params);
 

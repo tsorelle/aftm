@@ -7,6 +7,7 @@
 <body>
 <h1>IPN Test</h1>
 <form method="post" action="http://local.aftm/aftm/paypal/member/ipn/1">
+    <input type='hidden' name='txn_id' value='08E17046HH747477F' />
     <input type='hidden' name='mc_gross' value='25.00' />
     <input type='hidden' name='invoice' value='00000012' />
     <input type='hidden' name='protection_eligibility' value='Ineligible' />
@@ -19,14 +20,13 @@
     <input type='hidden' name='option_selection1' value='Family 1-year' />
     <input type='hidden' name='mc_fee' value='1.03' />
     <input type='hidden' name='notify_version' value='3.8' />
-    <input type='hidden' name='custom' value="Family Band" />
+    <input type='hidden' name='custom' value="formid=member;membername=Family Band" />
     <input type='hidden' name='payer_status' value='verified' />
     <input type='hidden' name='business' value='site-testing@aftm.us' />
     <input type='hidden' name='quantity' value='1' />
     <input type='hidden' name='verify_sign' value='AfAkavmC3xOd-bBA3ryNkIOB-nAFAnt1vMc6yKWS6TGB-wIV.VBphi4e' />
     <input type='hidden' name='payer_email' value='site-tester@aftm.us' />
     <input type='hidden' name='option_name1' value='Membership Type' />
-    <input type='hidden' name='txn_id' value='08E17046HH747470F' />
     <input type='hidden' name='payment_type' value='instant' />
     <input type='hidden' name='btn_id' value='3526636' />
     <input type='hidden' name='last_name' value='Timer' />
