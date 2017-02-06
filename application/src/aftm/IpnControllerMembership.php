@@ -64,22 +64,18 @@ class IpnControllerMembership extends IpnControllerBase
 
     function updateData($inputs)
     {
-        // TODO: Implement updateData() method.
+        if (isset($inputs->invoice) && isset($inputs->invoice->invoicenumber) ) {
+            if (!AftmMemberEntityManager::UpdatePayment($inputs->invoice->invoicenumber)) {
+                $this->writeLog("Warning: No membership entry found for invoice number '$inputs->invoice->invoicenumber'.");
+            }
+        }
+        else {
+            $this->writeLog('Warning: No invoice number recieved in IpnControllerMembership::updateData.');
+        }
     }
 
     function getFormId()
     {
         return "member";
-    }
-
-    /**
-     * Get transaction details from data
-     *
-     * @param array $inputs
-     * @return \stdClass
-     */
-    function getDetails($inputs)
-    {
-        // TODO: Implement getDetails() method.
     }
 }

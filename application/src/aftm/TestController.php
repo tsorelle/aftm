@@ -23,35 +23,36 @@ use Concrete\Core\Express\EntryList;
 class TestController extends Controller
 {
     public function doTest() {
-        $result = AftmCatalogManager::GetPrice('membership','Family 1-year');
-        echo '<br>'.($result == '25.00' ? 'success!' : 'failed').'<br>';
+        /*
+                $result = AftmCatalogManager::GetPrice('membership','Family 1-year');
+                echo '<br>'.($result == '25.00' ? 'success!' : 'failed').'<br>';
 
-        // $invoice = AftmInvoiceManager::Get('10000002');
-        // AftmInvoiceManager::Update('00000002');
+                // $invoice = AftmInvoiceManager::Get('10000002');
+                // AftmInvoiceManager::Update('00000002');
 
-/*
-       $manager = new AftmMemberEntityManager();
-        // $manager->createMemberEntity();
-        $data=array(
-            'member_first_name' => 'Liz',
-            'member_last_name' => 'Yeats',
-            'member_address1' => '904 E. Meadowmere',
-            'member_address2' => '',
-            'member_city' => 'Austin',
-            'member_state' => 'TX',
-            'member_zipcode' => '78758',
-            'member_email' => 'tls@2quakers.net',
-            'membership_type' => 'Individual 5-year',
-            'member_band_name' => '',
-            'member_band_website' => '',
-            'member_volunteer_interest' => 'any',
-            'member_payment_method' => 'paypal',
-            'member_invoice_number' => '00000212',
-            'new_or_renewal' => 'new',
-            'member_ideas' => 'some ideas'
-        );
-        $manager->insertMemberEntry($data);
-        */
+
+               $manager = new AftmMemberEntityManager();
+                // $manager->createMemberEntity();
+                $data=array(
+                    'member_first_name' => 'Liz',
+                    'member_last_name' => 'Yeats',
+                    'member_address1' => '904 E. Meadowmere',
+                    'member_address2' => '',
+                    'member_city' => 'Austin',
+                    'member_state' => 'TX',
+                    'member_zipcode' => '78758',
+                    'member_email' => 'tls@2quakers.net',
+                    'membership_type' => 'Individual 5-year',
+                    'member_band_name' => '',
+                    'member_band_website' => '',
+                    'member_volunteer_interest' => 'any',
+                    'member_payment_method' => 'paypal',
+                    'member_invoice_number' => '00000212',
+                    'new_or_renewal' => 'new',
+                    'member_ideas' => 'some ideas'
+                );
+                $manager->insertMemberEntry($data);
+                */
 
         echo "<br>Done<br>";
 

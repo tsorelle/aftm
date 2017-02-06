@@ -66,30 +66,29 @@ class AftmInvoiceManager
      * @return bool|\stdClass
      */
     public function GetInvoice($invoicenumber) {
-        $result = new \stdClass();
         $db = \Database::connection();
 
         $sql = 'SELECT * FROM aftminvoices WHERE invoicenumber = ?';
         $statement = $db->prepare($sql);
         $statement->bindValue(1, $invoicenumber);
         $statement->execute();
-        $result->invoice = $statement->fetch(PDO::FETCH_OBJ);
-        if ($result->invoice === false) {
+        $invoice = $statement->fetch(PDO::FETCH_OBJ);
+        if ($invoice === false) {
             return false;
         }
 
-        if (isset($result->invoice->id)) {
+        if (isset($invoice->id)) {
             $sql = 'SELECT * FROM aftminvoiceitems WHERE invoiceid = ?';
             $statement = $db->prepare($sql);
-            $statement->bindValue(1, $result->invoice->id);
+            $statement->bindValue(1, $invoice->id);
             $statement->execute();
-            $result->items = $statement->fetchAll(PDO::FETCH_OBJ);
+            $invoice->items = $statement->fetchAll(PDO::FETCH_OBJ);
         }
         else {
-            $result->items = array();
+            $invoice->items = array();
         }
         
-        return $result;
+        return $invoice;
     }
 
     public function checkPaypalTransactionId($transactionId) {

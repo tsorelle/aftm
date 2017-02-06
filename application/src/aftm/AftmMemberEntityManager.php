@@ -93,17 +93,21 @@ class AftmMemberEntityManager
         return $memberEntity;
     }
 */
-    public function updatePaymentInfo($invoiceNumber) {
+    public function updatePaymentInfo($invoiceNumber)
+    {
         $entity = $this->getEntity();
         $list = new EntryList($entity);
         $list->filterByMemberInvoiceNumber($invoiceNumber);
         $results = $list->getResults();
-        if (!empty($results)) {
-            $entry = $results[0];
-            $today = date('Y-m-d');
-            $entry->setMemberPaymentReceived_date($today);
-            $entry->save();
+        if (empty($results)) {
+            return false;
         }
+        $entry = $results[0];
+        $today = date('Y-m-d');
+        $entry->setAttribute('member_payment_received_date',$today);
+        $entry->save();
+
+        return true;
     }
 
     private function getMembershipTerm($membershipType) {
@@ -117,6 +121,7 @@ class AftmMemberEntityManager
         return 1;
 
     }
+
 
     public function insertMembershipEntry($memberData) {
         // $this->getEntityOrCreate(); // ensure 'member' entity exists
@@ -158,6 +163,6 @@ class AftmMemberEntityManager
         self::getInstance()->insertMembershipEntry($memberData);
     }
     public static function UpdatePayment($invoiceNumber) {
-        self::getInstance()->updatePaymentInfo($invoiceNumber);
+        return self::getInstance()->updatePaymentInfo($invoiceNumber);
     }
 }

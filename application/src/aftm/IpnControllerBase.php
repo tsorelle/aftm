@@ -38,7 +38,7 @@ abstract class IpnControllerBase extends Controller
     const debugLocal = 'local'; // write messages to html response
     const debugDump = 'dump';  // log post values to database
 
-    private function writeLog($message,$debugmode = false) {
+    protected function writeLog($message,$debugmode = false) {
         if ($this->ipndebug == self::debugLocal) {
             echo "<p>$message</p>";
             return;
@@ -211,14 +211,6 @@ abstract class IpnControllerBase extends Controller
     abstract function updateData($params);
 
     /**
-     * Get transaction details from data
-     *
-     * @param array $inputs
-     * @return \stdClass
-     */
-    abstract function getDetails($invoicenumber);
-
-    /**
      * @return string
      */
     abstract function getFormId();
@@ -258,20 +250,15 @@ abstract class IpnControllerBase extends Controller
     }
     
     private function updateInvoice($transactionId) {
-        $invoice = new \stdClass();
         $count = AftmInvoiceManager::Update($this->invoice,$transactionId);
         if ($count > 0) {
-            $invoice->invoice = AftmInvoiceManager::Get($this->invoice);
-            $invoice->details = $this->getDetails($this->invoice);
+            $invoice = AftmInvoiceManager::Get($this->invoice);
+            return $invoice;
         }
         else {
-            $invoice->invoice = false;
-            $invoice->details = false;
             $this->writeLog("IPN warning: Invoice #$this->invoice not found.");
+            return false;
         }
-
-        return $invoice;
-
     }
 
     protected function customValuesToArray() {
@@ -333,7 +320,8 @@ abstract class IpnControllerBase extends Controller
             return;
         }
 
-        $params = $this->updateInvoice($transactionId);
+        $params = new \stdClass();
+        $params->invoice = $this->updateInvoice($transactionId);
         $params->request = $this->getPostValues();
         $this->sendNotifications($params);
         $this->updateData($params);
