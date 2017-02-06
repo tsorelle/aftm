@@ -1,14 +1,15 @@
 <?php
 namespace Application\Block\ExternalForm\Form\Controller;
 
+use Core;
+use Concrete\Core\Controller\AbstractController;
+use Concrete\Core\Http\Request;
 use Application\Aftm\AftmConfiguration;
 use Application\Aftm\AftmInvoiceManager;
 use Application\Aftm\AftmMemberEntityManager;
 use Application\Aftm\PayPalForm;
-use Concrete\Core\Controller\AbstractController;
-use Concrete\Core\Http\Request;
+use Application\Aftm\AftmCatalogManager;
 use Concrete\Core\Utility\Service\Text;
-use Core;
 use Concrete\Core\Support\Facade\Express;
 
 /**
@@ -23,7 +24,8 @@ class AftmMemberForm extends AbstractController
 
     // private $showCaptcha = true; // set false for test sessions
     private $showCaptcha = false;
-    private $membershipTypes =  array(
+    private $membershipTypes;
+        /* =  array(
         "" => "--- Select ---",
         "Student 1-year" => "Student 1-year - $15.00",
         "Individual 1-year" => "Individual 1-year - $20.00",
@@ -32,8 +34,8 @@ class AftmMemberForm extends AbstractController
         "Business 1-year" => "Business - 1-year $50.00",
         "Individual 5-year" => "Individual  - 5-year $80.00",
         "Family 5-year" => "Family - 5-year - $100.00",
-        "Lifetime membership" => "Lifetime membership - $300.00"
-    );
+        "Lifetime membership" => "Lifetime membership - $300.00");
+        */
 
     /**
      * Retrieve and sanitize form values from request.
@@ -306,6 +308,7 @@ class AftmMemberForm extends AbstractController
 
         // Important! values must match those defined in the PayPal hosted form.
         // See \application\src\aftm\config.ini [form-member] for hosted button id numbers.
+        $this->membershipTypes = AftmCatalogManager::GetSelectList('membership', "--- Select ---");
         $this->set('membertypes', $this->membershipTypes);
         $this->set('payoptions',
             array(

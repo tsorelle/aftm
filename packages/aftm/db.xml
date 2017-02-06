@@ -81,4 +81,31 @@
         <field name="message" type="string" size="512">
         </field>
     </table>
+    <table name="aftmcatalog">
+        <field name="id" type="integer" size="10">
+            <unsigned/>
+            <autoincrement/>
+            <key/>
+        </field>
+        <field name="itemname" type="string" size="120">
+        </field>
+        <field name="catalognumber" type="string" size="120">
+        </field>
+        <field name="itemtype" type="string" size="120">
+        </field>
+        <field name="itemdescription" type="string" size="240">
+        </field>
+        <field name="unitprice" type="decimal">
+            <default value="0.00"/>
+            <notnull/>
+        </field>
+        <field name="displayorder" type="integer" size="10">
+            <default value="0" />
+            <notnull/>
+        </field>
+        <field name="active" type="boolean">
+            <default value="1" />
+            <notnull/>
+        </field>
+    </table>
 </schema>

@@ -7,7 +7,7 @@
  */
 
 namespace Application\Aftm;
-
+use PDO;
 
 class AftmCatalogManager
 {
@@ -20,45 +20,50 @@ class AftmCatalogManager
         return self::$instance;
     }
 
-    private function getPriceByProductType($productName, $typeName) {
-        // todo: finish implementation with database
-
-        // temporary pending database implementation
-        if ($productName == 'membership') {
-            switch ($typeName) {
-                case "Student 1-year" : return     15.00;
-                case "Individual 1-year" : return  20.00;
-                case "Family 1-year" : return  25.00;
-                case "Band or Dance Group 1-year" : return 25.00;
-                case "Business 1-year" : return 50.00;
-                case "Individual 5-year" : return 80.00;
-                case "Family 5-year" : return  100.00;
-                case "Lifetime membership" : return 300.00;
-            }
+    private function getPriceByItemType($itemname, $itemtype) {
+        $db = \Database::connection();
+        $statement = $db->executeQuery('SELECT unitprice FROM aftmcatalog WHERE itemname=? AND itemtype=?',
+            array($itemname,$itemtype));
+        $result = $statement->fetch();
+        if (empty($result)) {
+            return false;
         }
-        return 0;
+        return $result['unitprice'];
     }
 
-    private function getTypesForProduct($productName)
-    {
-        // todo: finish implementation
-        $result = array();
-        if ($productName === 'membership') {
+    private function getCatalogForItem($itemname) {
+        $db = \Database::connection();
 
+        $sql = 'SELECT * FROM aftmcatalog WHERE itemname = ? AND active=1 order by displayorder';
+        $statement = $db->prepare($sql);
+        $statement->bindValue(1, $itemname);
+        $statement->execute();
+        $results = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $results;
+    }
+
+    private function getSelectListItems($itemname, $unassigned=false) {
+        $result = array();
+        if (!empty($unassigned)) {
+            $result[''] = $unassigned;
+        }
+        $items = $this->getCatalogForItem($itemname);
+        foreach ($items as $item) {
+            $result[$item->itemtype] = $item->itemdescription;
         }
         return $result;
     }
-    public static function GetProductTypes($productName)
-    {
-        return self::getInstance()->getTypesForProduct($productName);
+
+    public static function GetPrice($itemname,$itemtype) {
+        return self::getInstance()->getPriceByItemType($itemname,$itemtype);
     }
 
-    public static function GetProductTypeInfo($productName,$typeName)
-    {
-        return self::getInstance()->getTypesForProduct($productName);
+    public static function GetCatalog($itemname) {
+        return self::getInstance()->getCatalogForItem($itemname);
     }
 
-    public static function GetPrice($productName,$typeName) {
-        return self::getInstance()->getPriceByProductType($productName,$typeName);
+    public static function GetSelectList($itemname,$unassigned=false) {
+        return self::getInstance()->getSelectListItems($itemname,$unassigned);
     }
 }

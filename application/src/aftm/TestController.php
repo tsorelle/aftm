@@ -23,7 +23,10 @@ use Concrete\Core\Express\EntryList;
 class TestController extends Controller
 {
     public function doTest() {
-        $invoice = AftmInvoiceManager::Get('10000002');
+        $result = AftmCatalogManager::GetPrice('membership','Family 1-year');
+        echo '<br>'.($result == '25.00' ? 'success!' : 'failed').'<br>';
+
+        // $invoice = AftmInvoiceManager::Get('10000002');
         // AftmInvoiceManager::Update('00000002');
 
 /*
