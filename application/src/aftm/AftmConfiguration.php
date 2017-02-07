@@ -77,6 +77,7 @@ class AftmConfiguration
         return $result;
     }
 
+
     /**
      * Parse the ini file, config.ini, located in same directory as this class file.
      * @return array

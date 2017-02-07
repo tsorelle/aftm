@@ -1,6 +1,7 @@
 <?php
 namespace Application\Block\ExternalForm\Form\Controller;
 
+use Application\aftm\AftmMailManager;
 use Core;
 use Concrete\Core\Controller\AbstractController;
 use Concrete\Core\Http\Request;
@@ -171,32 +172,48 @@ class AftmMemberForm extends AbstractController
      * @param $formData  - from getRequestValues()
      */
     private function sendNotifications($formData) {
-        // todo: implement sendNotifications
+        // todo: update templates for mail notifications
         $enabled = AftmConfiguration::getValue('email','form-member');
         if (!$enabled) {
             return;
         }
-        $recipients = AftmConfiguration::getEmailValues('notifications1','form-member');
-        if (empty($recipients)) {
-            return;
-        }
+        $testing = AftmConfiguration::getValue('emailtesting','site'); // if true, throw error exceptions
+
+        // send welcome message
 
         /**
          * @var \Concrete\Core\Mail\Service
          * see https://documentation.concrete5.org/developers/sending-mail/working-mail-service
          */
         $mailService = Core::make('mail');
-        $testing = AftmConfiguration::getValue('emailtesting','site');
+        $mailService->setTesting($testing);
+        $mailService->addParameter('membername',$formData->member_first_name.' '.$formData->member_last_name);
+        $mailService->addParameter('logo',AftmMailManager::GetLogo());
+        $mailService->addParameter('formValues',$formData);// $formData->member_first_name.' '.$formData->member_last_name);
+        $mailService->load('form_member_welcome','aftm');
+        $mailService->setSubject('Welcome to AFTM');
+        $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
+        $mailService->to($formData->member_email);
+        $mailService->sendMail();
+
+        $recipients = AftmConfiguration::getEmailValues('notifications1','form-member');
+        if (empty($recipients)) {
+            return;
+        }
+
+        // send notification message
+
+        $mailService = Core::make('mail');
         $mailService->setTesting($testing); // or true to throw an exception on error
-        $mailService->addParameter('name','my name is mud');// $formData->member_first_name.' '.$formData->member_last_name);
-        $mailService->load('form_member_notification1','aftm');
+        $mailService->addParameter('membername',$formData->member_first_name.' '.$formData->member_last_name);
+        $mailService->addParameter('formValues',$formData);
+        $mailService->load('form_member_notify','aftm');
         $mailService->setSubject('Membership recieved');
         $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
         foreach ($recipients as $recipient) {
             $mailService->to($recipient);
         }
         $mailService->sendMail();
-
     }
 
     /**

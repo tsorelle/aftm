@@ -60,6 +60,23 @@ class IpnControllerMembership extends IpnControllerBase
     function sendNotifications($inputs)
     {
         // TODO: Implement sendNotifications() method.
+        /**
+         * @var \Concrete\Core\Mail\Service
+         * see https://documentation.concrete5.org/developers/sending-mail/working-mail-service
+         */
+        $mailService = Core::make('mail');
+        $testing = AftmConfiguration::getValue('emailtesting','site');
+        $mailService->setTesting($testing); // or true to throw an exception on error
+        $mailService->addParameter('name','my name is mud');// $formData->member_first_name.' '.$formData->member_last_name);
+        $mailService->load('form_member_ipn_confirm','aftm');
+        $mailService->setSubject('Membership fee received');
+        $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
+
+
+        // $mailService->to($recipient);
+
+        // $mailService->sendMail();
+
     }
 
     function updateData($inputs)
