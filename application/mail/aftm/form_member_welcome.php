@@ -2,9 +2,10 @@
 /**
  * Created by PhpStorm.
  * User: Terry
- * Date: 2/7/2017
- * Time: 9:53 AM
+ * Date: 1/29/2017
+ * Time: 7:13 AM
  */
+
 $bodyHTML .= '<!DOCTYPE html>';
 $bodyHTML .= '<html lang="de">';
 $bodyHTML .= '  <head>';
@@ -13,6 +14,7 @@ $bodyHTML .= '  </head>';
 $bodyHTML .= '  <body>';
 $bodyHTML .= '      <div>';
 // Begin content
+
 /*
 A membership request was posted on the AFTM website.
 
@@ -33,8 +35,6 @@ Volunteer interests: [list of volunteer interests]
 Ideas for AFTM:
     [ideas]
 */
-
-// $bodyHTML .= $mailContent;
 
 // End content
 $bodyHTML .= '      </div>';

@@ -14,26 +14,14 @@ $bodyHTML .= '  <body>';
 $bodyHTML .= '      <div>';
 // Begin content
 /*
-A membership request was posted on the AFTM website.
+Dear [member: full name]
 
-[member: full name]
-Membership level: [membership level, e.g. "Individual 5-year"]
-Amount due: [cost]
-Payment type: [PayPal or Check]
-Email address: [email]
-Invoice number: [invoice number]
+Thank you for joining Austin Friends of Traditional Music and for your membership payment of $[amount]
 
-[address]
+Here is the information we have for you.  Please contact us if anything is incorrect, or if you have any further questions about AFTM.
 
-[band name (if any)]
-[Band web site (if any)]
-
-Volunteer interests: [list of volunteer interests]
-
-Ideas for AFTM:
-    [ideas]
+[contact info from form]
 */
-
 // $bodyHTML .= $mailContent;
 
 // End content

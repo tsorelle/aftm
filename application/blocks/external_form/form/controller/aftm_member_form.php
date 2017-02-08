@@ -1,7 +1,7 @@
 <?php
 namespace Application\Block\ExternalForm\Form\Controller;
 
-use Application\aftm\AftmMailManager;
+use Application\Aftm\AftmMailManager;
 use Core;
 use Concrete\Core\Controller\AbstractController;
 use Concrete\Core\Http\Request;
@@ -166,13 +166,27 @@ class AftmMemberForm extends AbstractController
         $id = AftmInvoiceManager::Post($invoiceData,$invoiceItems);
         return $id;
     }
+
+    private function getCheckInfo($formData)
+    {
+        if ($formData->payment_method != 'check') {
+            return '';
+
+        }
+        return '<p>Please mail your check or money order for $' .
+            $formData->cost.
+                ' to:<br><br>Austin Friends of Traditional Music<br>P.O. Box 49608<br>Austin, TX 78765.<p>' .
+                "<p>Write 'membership fee: $formData->membership_type' on the check memo and be sure that the name "  .
+                'and email address you entered is written on the check or in an accompanying note. </p>';
+    }
+
     /**
      * Send email notifications before paypal submission
      *
      * @param $formData  - from getRequestValues()
      */
     private function sendNotifications($formData) {
-        // todo: update templates for mail notifications
+
         $enabled = AftmConfiguration::getValue('email','form-member');
         if (!$enabled) {
             return;
@@ -180,16 +194,36 @@ class AftmMemberForm extends AbstractController
         $testing = AftmConfiguration::getValue('emailtesting','site'); // if true, throw error exceptions
 
         // send welcome message
+        $contactInfo = AftmMailManager::FormatAddress(
+            $formData->member_address1,$formData->member_address2,
+            $formData->member_city,$formData->member_state,$formData->member_zipcode);
 
+        if (!empty($formData->member_band_name)) {
+            $contactInfo .= '<p>Group: '.$formData->member_band_name;
+            if (!empty($formData->member_band_website)) {
+                $contactInfo .= ' ('.$formData->member_band_website.')';
+            }
+            $contactInfo .= '</p>';
+        }
+
+
+
+        $membershipType = $formData->membership_type. ($formData->new_or_renewal == 'new' ? '' : ' (renewal)');
+
+        $checkInfo = $this->getCheckInfo($formData);
         /**
          * @var \Concrete\Core\Mail\Service
          * see https://documentation.concrete5.org/developers/sending-mail/working-mail-service
          */
         $mailService = Core::make('mail');
         $mailService->setTesting($testing);
-        $mailService->addParameter('membername',$formData->member_first_name.' '.$formData->member_last_name);
         $mailService->addParameter('logo',AftmMailManager::GetLogo());
-        $mailService->addParameter('formValues',$formData);// $formData->member_first_name.' '.$formData->member_last_name);
+        $mailService->addParameter('formValues',$formData);
+        $mailService->addParameter('cost','$' . $formData->cost);
+        $mailService->addParameter('membername',$formData->member_first_name.' '.$formData->member_last_name);
+        $mailService->addParameter('membership',$membershipType);
+        $mailService->addParameter('contactInfo',$contactInfo);
+        $mailService->addParameter('checkInfo',$checkInfo);
         $mailService->load('form_member_welcome','aftm');
         $mailService->setSubject('Welcome to AFTM');
         $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
@@ -200,7 +234,7 @@ class AftmMemberForm extends AbstractController
         if (empty($recipients)) {
             return;
         }
-
+/*
         // send notification message
 
         $mailService = Core::make('mail');
@@ -214,6 +248,7 @@ class AftmMemberForm extends AbstractController
             $mailService->to($recipient);
         }
         $mailService->sendMail();
+*/
     }
 
     /**

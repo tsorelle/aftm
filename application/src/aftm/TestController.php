@@ -23,7 +23,25 @@ use Concrete\Core\Express\EntryList;
 class TestController extends Controller
 {
     public function doTest() {
+
+        $test = new \stdClass();
+        $test->bar = 1;
+        echo "foo ";
+        echo empty($test->foo) ? "empty<br>" : "not empty<br>";
+        echo "bar ";
+        echo empty($test->bar) ? "empty<br>" : "not empty<br>";
+
         /*
+        $mailService = Core::make('mail');
+        $mailService->addParameter('mailContent','<h2>Hello Person</h2><p>Welcome to AFTM.</p>');
+        $mailService->addParameter('logo',AftmMailManager::GetLogo());
+        $mailService->load('aftm/testmail');
+        $mailService->setSubject('Welcome to AFTM');
+        $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
+        $mailService->to('tls@2quakers.net','Terry SoRelle');
+        $mailService->sendMail();
+
+
                 $result = AftmCatalogManager::GetPrice('membership','Family 1-year');
                 echo '<br>'.($result == '25.00' ? 'success!' : 'failed').'<br>';
 

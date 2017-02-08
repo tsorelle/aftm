@@ -13,29 +13,16 @@ $bodyHTML .= '      <meta charset="utf-8">';
 $bodyHTML .= '  </head>';
 $bodyHTML .= '  <body>';
 $bodyHTML .= '      <div>';
+
 // Begin content
 
-/*
-A membership request was posted on the AFTM website.
-
-[member: full name]
-Membership level: [membership level, e.g. "Individual 5-year"]
-Amount due: [cost]
-Payment type: [PayPal or Check]
-Email address: [email]
-Invoice number: [invoice number]
-
-[address]
-
-[band name (if any)]
-[Band web site (if any)]
-
-Volunteer interests: [list of volunteer interests]
-
-Ideas for AFTM:
-    [ideas]
-*/
-
+$bodyHTML .= "<p>Dear $membername</p>";
+$bodyHTML .= "<p>Thank you for joining Austin Friends of Traditional Music and for your membership payment of $cost</p>";
+$bodyHTML .= "<p>The membership level you requested is: $membership</p>";
+$bodyHTML .= $checkInfo;
+$bodyHTML .= "<p>Here is the contact information we have for you.  Please contact us at aftmtexas@gmail.com if anything is incorrect, or if you have any further questions about AFTM.</p>";
+$bodyHTML .= $contactInfo;
+$bodyHTML .= $logo;
 // End content
 $bodyHTML .= '      </div>';
 $bodyHTML .= '  </body>';

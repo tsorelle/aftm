@@ -13,8 +13,9 @@ $bodyHTML .= '  </head>';
 $bodyHTML .= '  <body>';
 $bodyHTML .= '      <div>';
 // Begin content
+
 /*
-A membership request was posted on the AFTM website.
+ A membership request was posted on the AFTM website.
 
 [member: full name]
 Membership level: [membership level, e.g. "Individual 5-year"]
@@ -31,10 +32,11 @@ Invoice number: [invoice number]
 Volunteer interests: [list of volunteer interests]
 
 Ideas for AFTM:
-    [ideas]
-*/
+[ideas]
 
-// $bodyHTML .= $mailContent;
+http://aftmbeta.2quakers.net/application/files/2514/8218/9741/aftm-logo1.png
+
+ */
 
 // End content
 $bodyHTML .= '      </div>';
