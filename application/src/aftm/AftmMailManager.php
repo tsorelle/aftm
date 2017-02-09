@@ -14,6 +14,7 @@ class AftmMailManager
     private static $instance;
     private static $siteUrl;
     private static $logoMarkup;
+    private static $styleSheet;
     const logoUrl = '/packages/aftm/images/logos/aftm-logo-email.png';
     const supportUrl = '/index.php/support-aftm';
     const contactUrl = '/index.php/contact';
@@ -28,6 +29,36 @@ class AftmMailManager
             self::$siteUrl = $url;
         }
         return self::$siteUrl;
+    }
+
+    public function getTemplate($templateName,array $replacements = null) {
+        $filePath = __DIR__.'/email/'.$templateName;
+        $content = file_get_contents($filePath);
+        if ($content === false) {
+            return false;
+        }
+        if (!empty($replacements)) {
+            foreach ($replacements as $key => $value) {
+                $content = str_replace("[[$key]]",$value,$content);
+            }
+        }
+        return $content;
+    }
+
+    public function mergeHtml($content) {
+        return
+            '<!DOCTYPE html>'."\n".
+            '<html lang="de">'."\n".
+            '  <head>'."\n".
+            '      <meta charset="utf-8">'."\n".
+            $this->getStyleSheet()."\n".
+            '  </head>'."\n".
+            '  <body>'."\n".
+            '      <div>'."\n".
+            $content."\n".
+            "      </div>\n".
+            "  </body>\n".
+            "</html>\n";
     }
 
     public function formatAddressHtml($address1,$address2,$city,$state,$zipcode,$name='') {
@@ -58,9 +89,26 @@ class AftmMailManager
             return '';
         }
 
-        return '<p>'.implode("<br>\n",$contact).'</p>';
+        $html = '<p>'.implode("<br>\n",$contact).'</p>';
+        // $result->text = implode("\n",$contact);
+        return $html;
     }
-    
+
+    public function getStyleSheet() {
+        if (!isset(self::$styleSheet)) {
+            // add default styles
+            self::$styleSheet = array(
+                ' body { font-family: arial;}',
+                ' h1,h2,h3,h4 { color: #b15300;}',
+                ' .linklist { list-style: none }',
+                ' .linklist li { padding: 3px; }'
+            );
+        }
+        return  "<style>\n".
+                    implode("\n", self::$styleSheet)
+                ."</style>\n";
+    }
+
     public function getLogoMarkup()
     {
         if (!isset(self::$logoMarkup)) {
@@ -70,9 +118,11 @@ class AftmMailManager
             $result[] ='</td><td><a href="'.$siteUrl.'" ><img src="'.$siteUrl.self::logoUrl.'" /></a></td>';
 
             $result[] ='<td valign="middle" style="vertical-align: middle">';
-            $result[] = "<p><a href='$siteUrl'>Website (aftm.us)</a> </p>";
-            $result[] = '<p><a href="'.$siteUrl.self::contactUrl.'">Contact AFTM</a> </p>';
-            $result[] = '<p><a href="'.$siteUrl.self::supportUrl.'">Support AFTM</a> </p>';
+            $result[] ="<ul class='linklist'>";
+            $result[] = "<li><a href='$siteUrl'>AFTM Website (aftm.us)</a> </li>";
+            $result[] = '<li><a href="'.$siteUrl.self::contactUrl.'">Contact AFTM</a> </li>';
+            $result[] = '<li><a href="'.$siteUrl.self::supportUrl.'">Support AFTM</a> </li>';
+            $result[] ="</ul>";
             $result[] = "</td></tr></table>";
 
             // $result[] =     '<div><a href="'.$siteUrl.'" ><img src="'.$siteUrl.self::logoUrl.'" /></a></div>';
@@ -83,19 +133,79 @@ class AftmMailManager
         return self::$logoMarkup;
     }
 
-    public static function GetInstance()
-    {
-        if (!isset(self::$instance)) {
-            self::$instance = new AftmMailManager();
+    public function replaceTokens($template, $tokens, $value= null) {
+        if (!is_array($tokens)) {
+            return str_replace('[['.$tokens.']]',$value,$template);
         }
-        return self::$instance;
+        $result = $template;
+        foreach ($tokens as $name => $value) {
+            $result = str_replace('[['.$name.']]',$value,$result);
+        }
+        return $result;
     }
 
-    public static function GetLogo() {
-        return self::GetInstance()->getLogoMarkup();
+    private function convertLinks($html) {
+        $result = '';
+        $parts = explode('<a',$html);
+        $result = $parts[0];
+        $end = sizeof($parts) - 1;
+        for ($i=1; $i <= $end; $i++) {
+            $part = $parts[$i];
+            $href = stristr($part,'href');
+            if ($href === false) {
+                return $html;
+            }
+            $href = strstr($href,'>',true);
+            $href = str_ireplace('href','',$href);
+            $href = str_replace('=','',$href);
+            $href = str_replace("'",'',$href);
+            $href = str_replace('"','',$href);
+            $href = trim($href);
+            $part = strstr($part,'>');
+            $value = strstr($part,'<',true);
+            $value = strstr($value,'>');
+            $value = substr($value,1);
+            $value = trim($value);
+            $part = strstr($part,'</a>');
+            $part = str_ireplace('</a>','',$part);
+            if (!empty($value.$href) ) {
+                $result .= " $value ($href) ";
+            }
+            $result .= $part;
+        }
+        return $result;
     }
 
-    public static function FormatAddress($address1,$address2,$city,$state,$zipcode,$name='') {
-        return self::GetInstance()->formatAddressHtml($address1,$address2,$city,$state,$zipcode,$name);
+    public function toPlainText($html) {
+        $html = str_replace("\n",'',$html);
+        $html = str_ireplace('<p>','',$html);
+        $html = str_ireplace('</p>',"\n",$html);
+        $html = str_ireplace('<br>',"\n",$html);
+        $html = str_ireplace('<hr>',"\n---------------------------------------\n",$html);
+        $html = str_ireplace('<h1>','',$html);
+        $html = str_ireplace('</h1>',"\n\n",$html);
+        $html = str_ireplace('<h2>','',$html);
+        $html = str_ireplace('</h2>',"\n\n",$html);
+        $html = str_ireplace('<h3>','',$html);
+        $html = str_ireplace('</h3>',"\n\n",$html);
+        $html = str_ireplace('<h4>','',$html);
+        $html = str_ireplace('</h4>',"\n\n",$html);
+        $html = $this->convertLinks($html);
+        return strip_tags($html);
     }
+
+    public function getPlainLinks() {
+        $siteUrl = $this->getSiteUrl();
+        return
+            'AFTM Website: '.$siteUrl."\n".
+            'Contact AFTM: '.$siteUrl.self::contactUrl."\n".
+            'Support AFTM: '.$siteUrl.self::supportUrl."\n";
+    }
+
+    public static function Create()
+    {
+        return new AftmMailManager();
+    }
+
+
 }

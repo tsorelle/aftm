@@ -167,17 +167,36 @@ class AftmMemberForm extends AbstractController
         return $id;
     }
 
+    /**
+     * @param $mailManager AftmMailManager
+     * @param $formData
+     * @return string
+     */
+    private function getContactInfo($mailManager, $formData) {
+        $contactInfo = $mailManager->formatAddressHtml('904 E. Meadowmere','', 'Austin','TX','78758');
+        if (!empty($formData->member_band_name)) {
+            $contactInfo .= '<p>Group: '.$formData->member_band_name;
+            if (!empty($formData->member_band_website)) {
+                $contactInfo .= ' ('.$formData->member_band_website.')';
+            }
+            $contactInfo .= '</p>';
+        }
+        return $contactInfo;
+    }
+
     private function getCheckInfo($formData)
     {
         if ($formData->payment_method != 'check') {
             return '';
-
         }
-        return '<p>Please mail your check or money order for $' .
-            $formData->cost.
-                ' to:<br><br>Austin Friends of Traditional Music<br>P.O. Box 49608<br>Austin, TX 78765.<p>' .
-                "<p>Write 'membership fee: $formData->membership_type' on the check memo and be sure that the name "  .
+        else {
+            $result = '<p>Please mail your check or money order for $' .
+                $formData->cost.
+                ' to:<br><br>Austin Friends of Traditional Music<br>P.O. Box 49608<br>Austin, TX 78765.</p>' .
+                "<p></p>Write 'membership fee: $formData->membership_type' on the check memo and be sure that the name "  .
                 'and email address you entered is written on the check or in an accompanying note. </p>';
+        }
+        return $result;
     }
 
     /**
@@ -191,64 +210,59 @@ class AftmMemberForm extends AbstractController
         if (!$enabled) {
             return;
         }
+
         $testing = AftmConfiguration::getValue('emailtesting','site'); // if true, throw error exceptions
 
         // send welcome message
-        $contactInfo = AftmMailManager::FormatAddress(
-            $formData->member_address1,$formData->member_address2,
-            $formData->member_city,$formData->member_state,$formData->member_zipcode);
-
-        if (!empty($formData->member_band_name)) {
-            $contactInfo .= '<p>Group: '.$formData->member_band_name;
-            if (!empty($formData->member_band_website)) {
-                $contactInfo .= ' ('.$formData->member_band_website.')';
-            }
-            $contactInfo .= '</p>';
-        }
-
-
-
+        $mailManager = AftmMailManager::Create();
+        $contactInfo = $this->getContactInfo($mailManager,$formData);
         $membershipType = $formData->membership_type. ($formData->new_or_renewal == 'new' ? '' : ' (renewal)');
-
         $checkInfo = $this->getCheckInfo($formData);
+        $content = $mailManager->getTemplate('welcome_member.html',
+            array('membername' => $formData->member_first_name.' '.$formData->member_last_name,
+                'cost' => $formData->cost,
+                'checkInfo' => $checkInfo,
+                'contactInfo' => $contactInfo,
+                'membership' => $membershipType));
+
+        $contentHtml = str_replace('[[links]]',$mailManager->getLogoMarkup(),$content);
+        $contentHtml = $mailManager->mergeHtml($contentHtml);
+        $contentText = $mailManager->toPlainText($content);
+        $contentText = str_replace('[[links]]',$mailManager->getPlainLinks(),$contentText);
+
         /**
          * @var \Concrete\Core\Mail\Service
          * see https://documentation.concrete5.org/developers/sending-mail/working-mail-service
          */
         $mailService = Core::make('mail');
         $mailService->setTesting($testing);
-        $mailService->addParameter('logo',AftmMailManager::GetLogo());
-        $mailService->addParameter('formValues',$formData);
-        $mailService->addParameter('cost','$' . $formData->cost);
-        $mailService->addParameter('membername',$formData->member_first_name.' '.$formData->member_last_name);
-        $mailService->addParameter('membership',$membershipType);
-        $mailService->addParameter('contactInfo',$contactInfo);
-        $mailService->addParameter('checkInfo',$checkInfo);
-        $mailService->load('form_member_welcome','aftm');
+        $mailService->setBody($contentText);
+        // $mailService->setBodyHTML($contentHtml);
         $mailService->setSubject('Welcome to AFTM');
         $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
         $mailService->to($formData->member_email);
         $mailService->sendMail();
 
-        $recipients = AftmConfiguration::getEmailValues('notifications1','form-member');
-        if (empty($recipients)) {
-            return;
-        }
-/*
         // send notification message
+        /*
+                $recipients = AftmConfiguration::getEmailValues('notifications1','form-member');
+                if (empty($recipients)) {
+                    return;
+                }
 
-        $mailService = Core::make('mail');
-        $mailService->setTesting($testing); // or true to throw an exception on error
-        $mailService->addParameter('membername',$formData->member_first_name.' '.$formData->member_last_name);
-        $mailService->addParameter('formValues',$formData);
-        $mailService->load('form_member_notify','aftm');
-        $mailService->setSubject('Membership recieved');
-        $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
-        foreach ($recipients as $recipient) {
-            $mailService->to($recipient);
-        }
-        $mailService->sendMail();
-*/
+
+                $mailService = Core::make('mail');
+                $mailService->setTesting($testing); // or true to throw an exception on error
+                $mailService->addParameter('membername',$formData->member_first_name.' '.$formData->member_last_name);
+                $mailService->addParameter('formValues',$formData);
+                $mailService->load('form_member_notify','aftm');
+                $mailService->setSubject('Membership recieved');
+                $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
+                foreach ($recipients as $recipient) {
+                    $mailService->to($recipient);
+                }
+                $mailService->sendMail();
+        */
     }
 
     /**
