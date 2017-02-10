@@ -199,36 +199,55 @@ class AftmMemberForm extends AbstractController
         return $result;
     }
 
+    private function getAdditionalInfoSection($formData) {
+        $memberInterests = AftmMemberEntityManager::GetMemberInterests($formData);
+        if (empty( $formData->member_ideas) && empty($memberInterests) ) {
+            return '';
+        }
+        $result = array('<h3>Additional Information</h3>');
+        if (!empty($memberInterests)) {
+            $result[] = "<p><b>Volunteer interests: </b> $memberInterests</p>";
+        }
+        if (!empty( $formData->member_ideas)) {
+            $result[] = "<p><b>Ideas for AFTM:</b></p>";
+            $result[] = "<p>$formData->member_ideas</p>";
+        }
+        return implode("\n",$result);
+    }
+
     /**
      * Send email notifications before paypal submission
      *
      * @param $formData  - from getRequestValues()
      */
-    private function sendNotifications($formData) {
+    private function sendNotifications($formData)
+    {
 
-        $enabled = AftmConfiguration::getValue('email','form-member');
+        $enabled = AftmConfiguration::getValue('email', 'form-member');
         if (!$enabled) {
             return;
         }
 
-        $testing = AftmConfiguration::getValue('emailtesting','site'); // if true, throw error exceptions
+        $testing = AftmConfiguration::getValue('emailtesting', 'site'); // if true, throw error exceptions
 
         // send welcome message
         $mailManager = AftmMailManager::Create();
-        $contactInfo = $this->getContactInfo($mailManager,$formData);
-        $membershipType = $formData->membership_type. ($formData->new_or_renewal == 'new' ? '' : ' (renewal)');
+        $contactInfo = $this->getContactInfo($mailManager, $formData);
+        $membershipType = $formData->membership_type . ($formData->new_or_renewal == 'new' ? '' : ' (renewal)');
         $checkInfo = $this->getCheckInfo($formData);
         $content = $mailManager->getTemplate('welcome_member.html',
-            array('membername' => $formData->member_first_name.' '.$formData->member_last_name,
+            array('membername' => $formData->member_first_name . ' ' . $formData->member_last_name,
                 'cost' => $formData->cost,
                 'checkInfo' => $checkInfo,
                 'contactInfo' => $contactInfo,
                 'membership' => $membershipType));
 
-        $contentHtml = str_replace('[[links]]',$mailManager->getLogoMarkup(),$content);
+        $logoMarkup = $mailManager->getLogoMarkup();
+        $plainLinks = $mailManager->getPlainLinks();
+        $contentHtml = str_replace('[[links]]', $logoMarkup, $content);
         $contentHtml = $mailManager->mergeHtml($contentHtml);
         $contentText = $mailManager->toPlainText($content);
-        $contentText = str_replace('[[links]]',$mailManager->getPlainLinks(),$contentText);
+        $contentText = str_replace('[[links]]', $plainLinks, $contentText);
 
         /**
          * @var \Concrete\Core\Mail\Service
@@ -237,32 +256,45 @@ class AftmMemberForm extends AbstractController
         $mailService = Core::make('mail');
         $mailService->setTesting($testing);
         $mailService->setBody($contentText);
-        // $mailService->setBodyHTML($contentHtml);
+        $mailService->setBodyHTML($contentHtml);
         $mailService->setSubject('Welcome to AFTM');
         $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
         $mailService->to($formData->member_email);
         $mailService->sendMail();
 
         // send notification message
-        /*
-                $recipients = AftmConfiguration::getEmailValues('notifications1','form-member');
-                if (empty($recipients)) {
-                    return;
-                }
+        $recipients = AftmConfiguration::getEmailValues('notifications1', 'form-member');
+        if (empty($recipients)) {
+            return;
+        }
 
+        $additional = $this->getAdditionalInfoSection($formData);
+        $content = $mailManager->getTemplate('member_notify.html',
+            array('membername' => $formData->member_first_name . ' ' . $formData->member_last_name,
+                'cost' => $formData->cost,
+                'payment-method' => $formData->payment_method,
+                'contactInfo' => $contactInfo,
+                'additional' => $additional,
+                'email' => $formData->member_email,
+                'invoice' => $formData->invoicenumber,
+                'membership' => $membershipType));
 
-                $mailService = Core::make('mail');
-                $mailService->setTesting($testing); // or true to throw an exception on error
-                $mailService->addParameter('membername',$formData->member_first_name.' '.$formData->member_last_name);
-                $mailService->addParameter('formValues',$formData);
-                $mailService->load('form_member_notify','aftm');
-                $mailService->setSubject('Membership recieved');
-                $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
-                foreach ($recipients as $recipient) {
-                    $mailService->to($recipient);
-                }
-                $mailService->sendMail();
-        */
+        $contentHtml = str_replace('[[links]]', $logoMarkup, $content);
+        $contentHtml = $mailManager->mergeHtml($contentHtml);
+        $contentText = $mailManager->toPlainText($content);
+        $contentText = str_replace('[[links]]', $plainLinks, $contentText);
+
+        $mailService = Core::make('mail');
+        $mailService->setTesting($testing); // or true to throw an exception on error
+        $mailService->setSubject('Membership recieved');
+        $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
+        foreach ($recipients as $recipient) {
+            $mailService->to($recipient);
+        }
+        $mailService->setBody($contentText);
+        $mailService->setBodyHTML($contentHtml);
+        $mailService->sendMail();
+
     }
 
     /**

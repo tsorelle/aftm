@@ -159,6 +159,9 @@ class AftmMemberEntityManager
         $entry->save();
     }
 
+    public static function GetMemberInterests($memberData) {
+        return self::getInstance()->interestsToString($memberData);
+    }
     public static function AddMembership($memberData) {
         self::getInstance()->insertMembershipEntry($memberData);
     }
