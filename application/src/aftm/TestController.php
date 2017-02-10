@@ -50,33 +50,11 @@ class TestController extends Controller
     }
 
     public function doTest() {
-
-        $formData = new \stdClass();
-        $formData->member_band_name = 'Band of Gypsys';
-        $formData->member_band_website = 'gypsys@foo.com';
-        $formData->cost = '25';
-        $formData->membership_type = 'Individual 5-year';
-        $formData->payment_method = 'check';
-        $formData->new_or_renewal = 'renewal';
-        $formData->member_first_name = 'Terry';
-        $formData->member_last_name = 'SoRelle';
+        $invoice = '00000027';
+        $manager = new AftmMemberEntityManager();
+        $result = $manager->getMembershipByInvoiceNumber($invoice);
 
 
-        $mailManager = AftmMailManager::Create();
-        $contactInfo = $this->getContactInfo($mailManager,$formData);
-        $membershipType = $formData->membership_type. ($formData->new_or_renewal == 'new' ? '' : ' (renewal)');
-        $checkInfo = $this->getCheckInfo($formData);
-        $content = $mailManager->getTemplate('welcome_member.html',
-            array('membername' => $formData->member_first_name.' '.$formData->member_last_name,
-                'cost' => $formData->cost,
-                'checkInfo' => $checkInfo,
-                'contactInfo' => $contactInfo,
-                'membership' => $membershipType));
-
-        $contentHtml = str_replace('[[links]]',$mailManager->getLogoMarkup(),$content);
-        $contentHtml = $mailManager->mergeHtml($contentHtml);
-        $contentText = $mailManager->toPlainText($content);
-        $contentText = str_replace('[[links]]',$mailManager->getPlainLinks(),$contentText);
 
         /*
         $mailService = Core::make('mail');

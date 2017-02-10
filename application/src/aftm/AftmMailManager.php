@@ -190,6 +190,10 @@ class AftmMailManager
         $html = str_ireplace('</h3>',"\n\n",$html);
         $html = str_ireplace('<h4>','',$html);
         $html = str_ireplace('</h4>',"\n\n",$html);
+        $html = str_ireplace('<ul>',"\n",$html);
+        $html = str_ireplace('</ul>',"\n",$html);
+        $html = str_ireplace('<li>',"  - ",$html);
+        $html = str_ireplace('</li>',"\n",$html);
         $html = $this->convertLinks($html);
         return strip_tags($html);
     }

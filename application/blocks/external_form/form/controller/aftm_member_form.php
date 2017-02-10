@@ -173,7 +173,13 @@ class AftmMemberForm extends AbstractController
      * @return string
      */
     private function getContactInfo($mailManager, $formData) {
-        $contactInfo = $mailManager->formatAddressHtml('904 E. Meadowmere','', 'Austin','TX','78758');
+        $contactInfo = $mailManager->formatAddressHtml(
+            $formData->member_address1 ,
+            $formData->member_address2 ,
+            $formData->member_city ,
+            $formData->member_state ,
+            $formData->member_zipcode);
+
         if (!empty($formData->member_band_name)) {
             $contactInfo .= '<p>Group: '.$formData->member_band_name;
             if (!empty($formData->member_band_website)) {

@@ -48,10 +48,22 @@ class AftmMemberEntityManager
         $memberEntity = Express::getObjectByHandle(self::aftmMembershipHandle);
         if (empty($memberEntity)) {
             throw new \Exception('Entity "AFTM Membership" does not exist');
-           // return $this->createMemberEntity();
         }
         return $memberEntity;
     }
+
+    public function getMembershipByInvoiceNumber($invoiceNumber) {
+        $entity = $this->getEntity();
+        $list = new EntryList($entity);
+        $list->filterByMemberInvoiceNumber($invoiceNumber);
+        $results = $list->getResults();
+        if (empty($results)) {
+            return false;
+        }
+        return $results[0];
+    }
+
+
 
     /*
 
@@ -103,11 +115,12 @@ class AftmMemberEntityManager
             return false;
         }
         $entry = $results[0];
+
         $today = date('Y-m-d');
         $entry->setAttribute('member_payment_received_date',$today);
         $entry->save();
 
-        return true;
+        return $entry;
     }
 
     private function getMembershipTerm($membershipType) {
@@ -168,4 +181,5 @@ class AftmMemberEntityManager
     public static function UpdatePayment($invoiceNumber) {
         return self::getInstance()->updatePaymentInfo($invoiceNumber);
     }
+
 }

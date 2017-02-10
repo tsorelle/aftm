@@ -26,12 +26,14 @@ use Concrete\Core\Support\Facade\Express;
 use Concrete\Core\Entity\Express\Entity;
 use Concrete\Core\Express\Entry\Search\Result\Result;
 use Concrete\Core\Express\EntryList;
-
+use Imagine\Exception\Exception;
 
 
 abstract class IpnControllerBase extends Controller
 {
     private $invoicenumber = 'unknown';
+    private $configSection;
+    private $warnings = array();
     private $ipndebug = false;  // log messages except verbose
     const debugVerbose = 'verbose'; // log verbose messages
     const debugPhpLog = 'phplog'; // log to php error log
@@ -59,7 +61,7 @@ abstract class IpnControllerBase extends Controller
             $db = \Database::connection();
             $db->insert('aftmipnlog', array(
                 'formname' => $this->getFormId(),
-                'invoicenumber' => $this->invoice,
+                'invoicenumber' => $this->invoicenumber,
                 'message' => $message
             ));
         } catch (Exception $e) {
@@ -68,27 +70,6 @@ abstract class IpnControllerBase extends Controller
                 error_log("ipnlistener ('$formId'): " . $message, 0);
             }
         }
-        // write to database log here
-
-
-
-        /*
-        if (!isset($this->log)) {
-            $logpath = __DIR__ . '/logs/ipnlistener.txt';
-            $log = fopen($logpath);
-            if (empty($this->log)) {
-                error_log("ipnlistener: Cannot open log '" . $logpath . "'.",0);
-                $this->nolog = true;
-            }
-            if ($this->nolog) {
-                error_log("ipnlistener: ".$message,0);
-            }
-            else {
-                fwrite($this->log, "$message\n");
-                fclose($this->log);
-            }
-        }
-        */
     }
 
     /**
@@ -150,40 +131,28 @@ abstract class IpnControllerBase extends Controller
         \curl_close($ch);
         return (strcmp ($res, "VERIFIED") == 0);
     }
-    
 
-    private function logDbInfo()
-    {
-        /*
-        if (defined('DB_USERNAME')) {
-            // logging for debug - terry sorelle aftm.us
-            error_log("ipn_listener ".DB_USERNAME, 0);
+    protected function getEmailWarnings() {
+        if (empty($this->warnings)) {
+            return '';
         }
-        else {
-            // logging for debug - terry sorelle aftm.us
-            error_log("ipn_listener DB_USERNAME not defined.", 0);
 
+        $result = array(
+            '<h3>Warnings: </h3>',
+            '<p>The following warning messages were logged</p>',
+            '<ul>');
+        foreach ($this->warnings as $warning) {
+            $result[] = '<li>'.$warning.'</li>';
         }
-        if (defined('DB_DATABASE')) {
-            // logging for debug - terry sorelle aftm.us
-            error_log("ipn_listener ".DB_DATABASE, 0);
-        }
-        if (defined('DB_SERVER')) {
-            // logging for debug - terry sorelle aftm.us
-            error_log("ipn_listener ".DB_SERVER, 0);
-        }
-*/
-
+        $result[] = '</ul>';
+        return implode("\n",$result);
     }
 
-    protected function getPostValue($key)
+
+    protected function getPostValue($key,$default='')
     {
-        $value = isset($_POST[$key]) ? $_POST[$key] : '';
+        $value = isset($_POST[$key]) ? $_POST[$key] : $default;
         return $value;
-    }
-
-    private function dumpPostVars() {
-
     }
 
     /**
@@ -215,6 +184,16 @@ abstract class IpnControllerBase extends Controller
      */
     abstract function getFormId();
 
+    protected function getInvoiceNumber() {
+        return $this->invoicenumber;
+    }
+    protected function getConfigValue($setting,$default=false) {
+        if (!isset($this->configSection)) {
+            $this->configSection = 'form-'.$this->getFormId();
+        }
+        return AftmConfiguration::getValue($setting,$this->configSection,$default);
+    }
+
     /**
      * Validate the paypal transaction 
      * See: https://developer.paypal.com/docs/classic/ipn/integration-guide/IPNIntro/#id08CKFJ00JYK
@@ -242,7 +221,7 @@ abstract class IpnControllerBase extends Controller
         }
         $txnid = $this->getPostValue('txn_id');
         if (AftmInvoiceManager::CheckPaypalTransaction($txnid)) {
-            $this->writeLog("Paypal duplicate transaction '$txnid' for invoice '$this->invoice'");
+            $this->writeLog("Paypal duplicate transaction '$txnid' for invoice '$this->invoicenumber'");
             return false;
         }
 
@@ -250,16 +229,21 @@ abstract class IpnControllerBase extends Controller
     }
     
     private function updateInvoice($transactionId) {
-        $count = AftmInvoiceManager::Update($this->invoice,$transactionId);
+        $count = AftmInvoiceManager::Update($this->invoicenumber,$transactionId);
         if ($count > 0) {
-            $invoice = AftmInvoiceManager::Get($this->invoice);
+            $invoice = AftmInvoiceManager::Get($this->invoicenumber);
             return $invoice;
         }
         else {
-            $this->writeLog("IPN warning: Invoice #$this->invoice not found.");
+            $this->writeLog("IPN warning: Invoice #$this->invoicenumber not found.");
             return false;
         }
     }
+
+    protected function addWarning($msg) {
+        $this->warnings[] = $msg;
+    }
+
 
     protected function customValuesToArray() {
         $result = array();
@@ -275,11 +259,10 @@ abstract class IpnControllerBase extends Controller
     }
 
     /**
-     *
+     * Main IPN logic
      */
-    public function handleResponse() {
-        $configSection = 'form-'.$this->getFormId();
-        $this->ipndebug = AftmConfiguration::getValue('ipndebug',$configSection,false);
+    private function process() {
+
         $request = Request::getInstance();
         $sandboxMode = $request->get('sandbox');
         $formId = $this->getFormId();
@@ -289,17 +272,16 @@ abstract class IpnControllerBase extends Controller
             $this->writeLog('IPN ERROR: No invoice number in IPN request.',self::debugVerbose);
             return;
         }
-        $this->invoice = $invoiceNumber;
-        $transactionId = $this->authenticatePaypalTransaction($sandboxMode); 
+        $this->invoicenumber = $invoiceNumber;
+        $transactionId = $this->authenticatePaypalTransaction($sandboxMode);
         if ($transactionId === false) {
             return;
         }
 
-
         $this->writeLog("IPN Listener for $formId recieved message");
         $this->writeLog("Sandbox: ". ($sandboxMode? 'yes':'no'), self::debugVerbose);
 
-        $verify = AftmConfiguration::getValue('ipnverify',$configSection,false);
+        $verify = $this->getConfigValue('ipnverify');
         if (!empty($verify)) {
             if (!$this->verifyPayPalRequest($sandboxMode)) {
                 $this->writeLog('IPN ERROR: Cannot verify paypal request');
@@ -316,16 +298,39 @@ abstract class IpnControllerBase extends Controller
         }
 
         if ($this->ipndebug == self::debugDump) {
-            $this->writeLog("IPN listener test completed.  Form:'$formId', Invoice number: '$this->invoice'");
+            $this->writeLog("IPN listener test completed.  Form:'$formId', Invoice number: '$this->invoicenumber'");
             return;
         }
 
         $params = new \stdClass();
         $params->invoice = $this->updateInvoice($transactionId);
         $params->request = $this->getPostValues();
-        $this->sendNotifications($params);
         $this->updateData($params);
+        $this->sendNotifications($params);
 
-        $this->writeLog("IPN listener coupleted.  Form:'$formId', Invoice number: '$this->invoice'");
+        $this->writeLog("IPN listener completed.  Form:'$formId', Invoice number: '$this->invoicenumber'");
+    }
+
+    /**
+     * Entry point for IPN listener
+     */
+    public function handleResponse() {
+        try {
+            $this->ipndebug = $this->getConfigValue('ipndebug');
+            $this->process();
+        }
+        catch (\Exception $ex) {
+            if ($this->ipndebug == self::debugLocal) {
+                throw $ex;
+            }
+            $msg = "PayPal IPN process failed: ".$ex->getMessage();
+            error_log($msg,0); // to php error log
+            error_log($msg,1,'websupport@aftm.us'); // to email
+            if ($this->ipndebug != self::debugPhpLog) {
+                // attempt regular ipn logging.
+                $this->writeLog($msg);
+            }
+            exit($msg);
+        }
     }
 }
