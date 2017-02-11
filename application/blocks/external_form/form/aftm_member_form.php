@@ -186,9 +186,8 @@ if (!empty($errormessage)) {
                     <div><?php $captcha->display(); ?></div>
                     <div><?php $captcha->showInput(); ?></div>
                 </div>
-
-<?php } ?>
             </fieldset>
+<?php } ?>
 
     <div class="form-group">
         <p>
