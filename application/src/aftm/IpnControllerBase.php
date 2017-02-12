@@ -170,14 +170,14 @@ abstract class IpnControllerBase extends Controller
      *      with elements request, details, invoice
      * @return mixed
      */
-    abstract function sendNotifications($params);
+    abstract function sendNotifications($inputs);
 
     /**
      * @param \stdClass $params
      *      with elements request, details, invoice
      * @return boolean
      */
-    abstract function updateData($params);
+    abstract function updateData($inputs);
 
     /**
      * @return string

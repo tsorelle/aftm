@@ -14,7 +14,7 @@ use Concrete\Core\Controller\AbstractController;
 use Concrete\Core\Http\Request;
 use Application\Aftm\AftmConfiguration;
 use Application\Aftm\AftmInvoiceManager;
-use Application\Aftm\AftmMemberEntityManager;
+use Application\Aftm\AftmDonationEntityManager;
 use Application\Aftm\PayPalForm;
 use Application\Aftm\AftmCatalogManager;
 use Concrete\Core\Utility\Service\Text;
@@ -39,8 +39,8 @@ class AftmDonationForm extends AbstractController
      */
     private function clearFormData() {
         $formData = new \stdClass();
-        // $formData->payment_method              = 'paypal';
-        $formData->donation_amount           = '';
+        $formData->payment_method              = 'paypal';
+        // $formData->donation_amount            = '';
         $formData->donor_first_name           = '';
         $formData->donor_last_name            = '';
         $formData->donor_address1             = '';
@@ -55,20 +55,19 @@ class AftmDonationForm extends AbstractController
     }
     private function setDefaults() {
 
-        // todo: not needed?
+      // todo: not needed?
 
     }
     
     /**
-     * Controller 'view' action. Invoked before processing template ../aftm_member_form.php
+     * Controller 'view' action. Invoked before processing template ../aftm_donation_form.php
      */
     public function view()
     {
         $this->clearFormData();
-        $this->set('totalCost', '');
         $this->setCaptcha();
         $this->setDefaults();
-        $this->set('activepanel', 'donationform');
+        $this->set('activepanel', 'donorform');
     }
 
     private function getRequestValues() {
@@ -77,7 +76,7 @@ class AftmDonationForm extends AbstractController
 
         $textHelper = Core::make('helper/text');
 
-        $formData->donation_amount            = $textHelper->sanitize($request->get('donation_amount'));
+        // $formData->donation_amount            = $textHelper->sanitize($request->get('donation_amount'));
         // $formData->payment_method            = $textHelper->sanitize($request->get('payment_method'));
         $formData->donor_first_name         = $textHelper->sanitize($request->get('donor_first_name'));
         $formData->donor_last_name          = $textHelper->sanitize($request->get('donor_last_name'));
@@ -97,7 +96,7 @@ class AftmDonationForm extends AbstractController
         if (!empty($formData->donor_address1)) {
             $result = $formData->donor_address1;
         }
-        if (!empty($formData->adonor_ddress2)) {
+        if (!empty($formData->donor_address2)) {
             $result .= (empty($result) ? '' : ',').$formData->donor_address2;
         }
         $city = trim($formData->donor_city.' '.$formData->donor_state.' '.$formData->donor_zipcode);
@@ -110,18 +109,18 @@ class AftmDonationForm extends AbstractController
 
     private function postInvoice($formData) {
         $invoiceData = array(
-            'customername'    => $formData->member_first_name.' '.$formData->member_last_name,
+            'customername'    => $formData->donor_first_name.' '.$formData->donor_last_name,
             'customeraddress' => $this->getInvoiceAddress($formData),
-            'customeremail'   => $formData->member_email,
-            'paymentmethod' => $formData->payment_method
+            'customeremail'   => $formData->donor_email,
+            'paymentmethod' => 'paypal'
         );
 
         $invoiceItems = Array (
             Array(
-                'itemname'  => 'membership',
-                'itemtype'  => $formData->membership_type,
+                'itemname'  => 'donation',
+                'itemtype'  => 'general',
                 'quantity'  => '1',
-                'amount'    => $formData->cost,
+                'amount'    => 0.0,
             )
         );
         $id = AftmInvoiceManager::Post($invoiceData,$invoiceItems);
@@ -144,31 +143,52 @@ class AftmDonationForm extends AbstractController
                 return false;
             }
         }
-        if (empty($formData->donation_amount)) {
-            $this->set('errormessage','You must enter the amount of your donation.');
-            return false;
-        }
-        // todo: validate number
-        
+
         if (empty($formData->donor_first_name) || empty($formData->donor_last_name)) {
             $this->set('errormessage','You must enter first and last name');
             return false;
         }
-        if (empty($formData->donor_address1) ||
+        $noaddress = (empty($formData->donor_address1) ||
             empty($formData->donor_city) ||
             empty($formData->donor_state) ||
-            empty($formData->donor_zipcode)) {
-            $this->set('errormessage','Please enter full address including address, city, state/province, postal code or country');
-            return false;
+            empty($formData->donor_zipcode));
+
+        if (empty($formData->donor_email)) {
+            if ($noaddress) {
+                $this->set('errormessage',"Please enter either an email address or full postal address so that we my acknowledge your donation.");
+                return false;
+            }
         }
-        if (!filter_var($formData->donor_email, FILTER_VALIDATE_EMAIL)) {
-            $this->set('errormessage', 'Please enter a valid email address.');
-            return false;
+        else {
+            if (!filter_var($formData->donor_email, FILTER_VALIDATE_EMAIL)) {
+                $this->set('errormessage', 'Please enter a valid email address.');
+                return false;
+            }
         }
 
         return true;
     }
-
+    /**
+     * Create markup for PayPalForm
+     * See \application\src\aftm\config.ini [form-donation] for hosted button id numbers and other values
+     *
+     * @param $invoicenumber - passed to paypal as unique invoice identifier
+     * @param $donorname
+     */
+    private function getPayPalForm($invoicenumber,$donorname) {
+        $form = PayPalForm::CreateStoredForm('donation');
+        $ipnenabled = AftmConfiguration::getValue('ipnenabled','form-donation',false);
+        if ($ipnenabled) {
+            $form->setIpnListner();
+        }
+        $form->addCustomValue("formid",'donation');
+        $form->addCustomValue("donorname",$donorname);
+        $form->setInvoiceNumber($invoicenumber);
+        $form->setReturnUrl();
+        $autolaunch = AftmConfiguration::getValue('paypalredirect','form-donation',true);
+        $results = $form->getMarkup($autolaunch); // with 'autolaunch' immediate redirect to PayPal
+        $this->set('paypalform',$results);
+    }
 
     /**
      * Entry point for form action.
@@ -184,35 +204,21 @@ class AftmDonationForm extends AbstractController
             $formData = $this->getRequestValues();
             if (!$this->validate($formData)) {
                 $this->set('formData',$formData);
-                $this->set('activepanel','memberform');
+                $this->set('activepanel','donorform');
                 return false;
             }
 
-            // $formData->cost = $this->getCost($formData->membership_type);
             $formData->invoicenumber = $this->postInvoice($formData);
-            // todo: finish action_submit_donation
-            /*
             AftmDonationEntityManager::AddDonation($formData);
 
             $donorName = $formData->donor_first_name.' '.$formData->donor_last_name;
             $formData->donorId = $donorName;
-            if ($formData->payment_method == 'paypal') {
-                $this->set('activepanel','paypal');
-                $this->getPayPalForm(
-                    $formData->donorship_type, $formData->invoicenumber, $donorName
-                );
-            }
-            else {
-                $this->set('activepanel','checks');
-            }
-            $this->sendNotifications($formData);
-            $this->set('totalCost','$'.$formData->cost);
-            $this->set('donorshipType',$formData->donorship_type);
-            $message =
-                'Membership saved for '.
-                $formData->member_first_name.' '.$formData->member_last_name.' ('.$formData->member_email.')<br>Thanks for Joining AFTM!';
 
-            */
+            $this->set('activepanel','paypal');
+            $this->getPayPalForm(
+                $formData->invoicenumber, $donorName
+            );
+
             $this->clearFormData();
 
 

@@ -19,10 +19,9 @@ if (!empty($errormessage)) {
     <?php
 }
 ?>
-
 <?php
-if ($activepanel == 'donationform') {
-    ?>
+    if ($activepanel == 'donorform') {
+?>
     <div class="row" style="margin-top: 20px">
         <div class="col-md-12">
 
@@ -30,19 +29,6 @@ if ($activepanel == 'donationform') {
                 <!-- p><?php echo $message?></p -->
                 <fieldset >
                     <legend>Submit Your Donation</legend>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="" class="control-label">Amount of donation<span class="required-field">*</span></label>
-                                <?php echo $form->text('donation_amount',$formData->donation_amount)?>
-                            </div>
-
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                            </div>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -61,7 +47,7 @@ if ($activepanel == 'donationform') {
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="donor_address1" class="control-label">Address line 1<span class="required-field">*</span></label>
+                                <label for="donor_address1" class="control-label">Address line 1</label>
                                 <?php echo $form->text('donor_address1',$formData->donor_address1)?>
                             </div>
                             <div class="form-group">
@@ -73,21 +59,21 @@ if ($activepanel == 'donationform') {
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="donor_city" class="control-label">City<span class="required-field">*</span></label>
+                                <label for="donor_city" class="control-label">City</label>
                                 <?php echo $form->text('donor_city',$formData->donor_city)?>
                             </div>
 
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="donor_state" class="control-label">State/Province<span class="required-field">*</span></label>
+                                <label for="donor_state" class="control-label">State/Province</label>
                                 <?php echo $form->text('donor_state',$formData->donor_state)?>
                             </div>
 
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="" class="control-label">Postal Code<span class="required-field">*</span></label>
+                                <label for="" class="control-label">Postal Code</label>
                                 <?php echo $form->text('donor_zipcode',$formData->donor_zipcode)?>
                             </div>
 
@@ -96,18 +82,21 @@ if ($activepanel == 'donationform') {
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="donor_email" class="control-label">Email address<span class="required-field">*</span></label>
+                                <label for="donor_email" class="control-label">Email address</label>
                                 <?php echo $form->text('donor_email',$formData->donor_email)?>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="donor_email" class="control-label">Phone number<span class="required-field">*</span></label>
-                                <?php echo $form->text('donor_email',$formData->donor_phone)?>
+                                <label for="donor_email" class="control-label">Phone number</label>
+                                <?php echo $form->text('donor_phone',$formData->donor_phone)?>
                             </div>
                         </div>
                     </div>
                 </fieldset>
+                <p>
+                    <span class="required-field">*</span> Indicates required information.
+                </p>
 
                 <?php if($showCaptcha) { ?>
                 <fieldset>
@@ -124,11 +113,16 @@ if ($activepanel == 'donationform') {
                     <?php } ?>
                 </fieldset>
 
-                <div class="form-group">
-                    <p>
-                        <span class="required-field">*</span> Indicates required information.
-                    </p>
-                    <input type="submit" name="submit" value="Submit your membership form" class="btn btn-default" />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="" class="control-label">Amount of donation</label>
+                            <p>
+                                <i>Please click the button and enter the amount of your donation in the PayPal form.</i>
+                            </p>
+                            <input type="submit" name="submit" value="Submit your donation" class="btn btn-default" />
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

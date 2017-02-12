@@ -22,80 +22,23 @@ use Concrete\Core\Express\EntryList;
 
 class TestController extends Controller
 {
-    private function getCheckInfo($formData)
-    {
-        if ($formData->payment_method != 'check') {
-            return '';
-        }
-        else {
-            $result = '<p>Please mail your check or money order for $' .
-                $formData->cost.
-                ' to:<br><br>Austin Friends of Traditional Music<br>P.O. Box 49608<br>Austin, TX 78765.</p>' .
-                "<p></p>Write 'membership fee: $formData->membership_type' on the check memo and be sure that the name "  .
-                'and email address you entered is written on the check or in an accompanying note. </p>';
-        }
-        return $result;
-    }
 
-    private function getContactInfo($mailManager, $formData) {
-        $contactInfo = $mailManager->formatAddressHtml('904 E. Meadowmere','', 'Austin','TX','78758');
-        if (!empty($formData->member_band_name)) {
-            $contactInfo .= '<p>Group: '.$formData->member_band_name;
-            if (!empty($formData->member_band_website)) {
-                $contactInfo .= ' ('.$formData->member_band_website.')';
-            }
-            $contactInfo .= '</p>';
-        }
-        return $contactInfo;
-    }
 
     public function doTest() {
-        $invoice = '00000027';
-        $manager = new AftmMemberEntityManager();
-        $result = $manager->getMembershipByInvoiceNumber($invoice);
+        $formData = new \stdClass();
+        $formData->donor_first_name           = 'Terry';
+        $formData->donor_last_name            = 'SoRelle';
+        $formData->donor_address1             = '904 E. Meadowmere';
+        $formData->donor_address2             = '';
+        $formData->donor_city                 = 'Austin';
+        $formData->donor_state                = 'TX';
+        $formData->donor_zipcode              = '78758';
+        $formData->donor_email                = 'tls@2quakers.net';
+        $formData->donor_phone                = '512-789-7321';
+        $formData->donation_invoice_number   = '0000000028';
 
-
-
-        /*
-        $mailService = Core::make('mail');
-        $mailService->addParameter('mailContent','<h2>Hello Person</h2><p>Welcome to AFTM.</p>');
-        $mailService->addParameter('logo',AftmMailManager::GetLogo());
-        $mailService->load('aftm/testmail');
-        $mailService->setSubject('Welcome to AFTM');
-        $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
-        $mailService->to('tls@2quakers.net','Terry SoRelle');
-        $mailService->sendMail();
-
-
-                $result = AftmCatalogManager::GetPrice('membership','Family 1-year');
-                echo '<br>'.($result == '25.00' ? 'success!' : 'failed').'<br>';
-
-                // $invoice = AftmInvoiceManager::Get('10000002');
-                // AftmInvoiceManager::Update('00000002');
-
-
-               $manager = new AftmMemberEntityManager();
-                // $manager->createMemberEntity();
-                $data=array(
-                    'member_first_name' => 'Liz',
-                    'member_last_name' => 'Yeats',
-                    'member_address1' => '904 E. Meadowmere',
-                    'member_address2' => '',
-                    'member_city' => 'Austin',
-                    'member_state' => 'TX',
-                    'member_zipcode' => '78758',
-                    'member_email' => 'tls@2quakers.net',
-                    'membership_type' => 'Individual 5-year',
-                    'member_band_name' => '',
-                    'member_band_website' => '',
-                    'member_volunteer_interest' => 'any',
-                    'member_payment_method' => 'paypal',
-                    'member_invoice_number' => '00000212',
-                    'new_or_renewal' => 'new',
-                    'member_ideas' => 'some ideas'
-                );
-                $manager->insertMemberEntry($data);
-                */
+        $invoice = '0000000028';
+        AftmDonationEntityManager::UpdatePayment($invoice,'10.38');
 
         echo "<br>Done<br>";
 
