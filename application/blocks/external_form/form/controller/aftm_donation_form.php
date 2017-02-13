@@ -155,7 +155,7 @@ class AftmDonationForm extends AbstractController
 
         if (empty($formData->donor_email)) {
             if ($noaddress) {
-                $this->set('errormessage',"Please enter either an email address or full postal address so that we my acknowledge your donation.");
+                $this->set('errormessage',"Please enter either an email address or full postal address so that we may acknowledge your donation.");
                 return false;
             }
         }
@@ -208,7 +208,7 @@ class AftmDonationForm extends AbstractController
                 return false;
             }
 
-            $formData->invoicenumber = $this->postInvoice($formData);
+            $formData->donation_invoice_number = $this->postInvoice($formData);
             AftmDonationEntityManager::AddDonation($formData);
 
             $donorName = $formData->donor_first_name.' '.$formData->donor_last_name;

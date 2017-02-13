@@ -18,6 +18,8 @@ class AftmMailManager
     const logoUrl = '/packages/aftm/images/logos/aftm-logo-email.png';
     const supportUrl = '/index.php/support-aftm';
     const contactUrl = '/index.php/contact';
+    const joinUrl = '/index.php/join-aftm';
+
 
     public function getSiteUrl() {
         if (!isset(self::$siteUrl)) {
@@ -109,7 +111,8 @@ class AftmMailManager
                 ."</style>\n";
     }
 
-    public function getLogoMarkup()
+    public function getLogoMarkup($links = 'site,contact,support')
+
     {
         if (!isset(self::$logoMarkup)) {
             $siteUrl = $this->getSiteUrl();
@@ -119,15 +122,21 @@ class AftmMailManager
 
             $result[] ='<td valign="middle" style="vertical-align: middle">';
             $result[] ="<ul class='linklist'>";
+
+            $linklist = explode(',',$links);
+            foreach($linklist as $linkname) {
+                $link = $this->getLink($linkname);
+                $result[] = "<li><a href='$link->href'>$link->label</a> </li>";
+            }
+
+            /*
             $result[] = "<li><a href='$siteUrl'>AFTM Website (aftm.us)</a> </li>";
             $result[] = '<li><a href="'.$siteUrl.self::contactUrl.'">Contact AFTM</a> </li>';
             $result[] = '<li><a href="'.$siteUrl.self::supportUrl.'">Support AFTM</a> </li>';
+            */
             $result[] ="</ul>";
             $result[] = "</td></tr></table>";
 
-            // $result[] =     '<div><a href="'.$siteUrl.'" ><img src="'.$siteUrl.self::logoUrl.'" /></a></div>';
-            // $result[] =     '<div><a href="'.$siteUrl.self::supportUrl.'"> Support AFTM</a></div>';
-            // $result[] = '</div>';
             self::$logoMarkup = implode("\n",$result);
         }
         return self::$logoMarkup;
@@ -198,12 +207,45 @@ class AftmMailManager
         return strip_tags($html);
     }
 
-    public function getPlainLinks() {
+    public function getLink($linkName) {
         $siteUrl = $this->getSiteUrl();
-        return
+        $result = new \stdClass();
+        switch ($linkName) {
+            case 'contact' :
+                $result->label = 'Contact AFTM';
+                $result->href =  $siteUrl.self::contactUrl;
+                break;
+            case 'support' :
+                $result->label = 'Support AFTM';
+                $result->href =  $siteUrl.self::supportUrl;
+                break;
+            case 'join' :
+                $result->label = 'Join AFTM';
+                $result->href =  $siteUrl.self::joinUrl;
+                break;
+            default:
+                $result->label = 'AFTM Website';
+                $result->href =  $siteUrl;
+                break;
+        }
+        return $result;
+    }
+
+    public function getPlainLinks($links = 'site,contact,support') {
+        $result = array();
+        $linklist = explode(',',$links);
+        foreach($linklist as $linkname) {
+            $link = $this->getLink($linkname);
+            $result[] = "$link->label: $link->href";
+        }
+
+        return implode("\n",$result);
+
+        /*
             'AFTM Website: '.$siteUrl."\n".
             'Contact AFTM: '.$siteUrl.self::contactUrl."\n".
             'Support AFTM: '.$siteUrl.self::supportUrl."\n";
+        */
     }
 
     public static function Create()

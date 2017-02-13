@@ -78,6 +78,17 @@ Route::register(
     'Application\Aftm\IpnControllerMembership::handleResponse'
 );
 
+Route::register(
+    '/aftm/paypal/donation/ipn',
+    'Application\Aftm\IpnControllerDonation::handleResponse'
+);
+
+Route::register(
+    '/aftm/paypal/donation/ipn/{sandbox}',
+    'Application\Aftm\IpnControllerDonation::handleResponse'
+);
+
+
 
 Route::register(
     '/aftm/test',

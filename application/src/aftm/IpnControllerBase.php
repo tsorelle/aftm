@@ -166,14 +166,14 @@ abstract class IpnControllerBase extends Controller
     abstract function getPostValues();
 
     /**
-     * @param \stdClass $params
+     * @param \stdClass $inputs
      *      with elements request, details, invoice
      * @return mixed
      */
     abstract function sendNotifications($inputs);
 
     /**
-     * @param \stdClass $params
+     * @param \stdClass $inputs
      *      with elements request, details, invoice
      * @return boolean
      */
@@ -302,11 +302,11 @@ abstract class IpnControllerBase extends Controller
             return;
         }
 
-        $params = new \stdClass();
-        $params->invoice = $this->updateInvoice($transactionId);
-        $params->request = $this->getPostValues();
-        $this->updateData($params);
-        $this->sendNotifications($params);
+        $inputs = new \stdClass();
+        $inputs->invoice = $this->updateInvoice($transactionId);
+        $inputs->request = $this->getPostValues();
+        $this->updateData($inputs);
+        $this->sendNotifications($inputs);
 
         $this->writeLog("IPN listener completed.  Form:'$formId', Invoice number: '$this->invoicenumber'");
     }
