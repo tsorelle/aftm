@@ -216,7 +216,7 @@ class AftmDonationForm extends AbstractController
 
             $this->set('activepanel','paypal');
             $this->getPayPalForm(
-                $formData->invoicenumber, $donorName
+                $formData->donation_invoice_number, $donorName
             );
 
             $this->clearFormData();
