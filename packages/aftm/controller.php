@@ -26,5 +26,4 @@ class Controller extends Package
         $pkg = parent::install();
         PageTheme::add('aftm', $pkg);
     }
-
 }

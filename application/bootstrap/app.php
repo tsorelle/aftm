@@ -64,8 +64,10 @@
  * ----------------------------------------------------------------------------
  */
 
+
 $classLoader = new \Symfony\Component\ClassLoader\Psr4ClassLoader();
 $classLoader->addPrefix('Application\\Aftm', DIR_APPLICATION . '/' . DIRNAME_CLASSES . '/aftm');
+$classLoader->addPrefix('Application\\Tops', DIR_APPLICATION . '/' . DIRNAME_CLASSES . '/tops');
 $classLoader->register();
 
 Route::register(
@@ -95,5 +97,12 @@ Route::register(
     'Application\Aftm\TestController::doTest'
 );
 
+Route::register(
+    '/tops/service/execute/{sid}',
+    'Application\Tops\services\ServiceRequestHandler::executeService'
+);
 
-//     'Concrete\Package\Aftm\Controller\IpnController::handleResponse'
+Route::register(
+    '/tops/service/execute/{sid}/{arg}',
+    'Application\Tops\services\ServiceRequestHandler::executeService'
+);
