@@ -14,7 +14,7 @@ module Tops {
     const corePath  = '/packages/knockout_view/js/';
     const appRootPath = '/application/mvvm/';
     // see routing declarations in /application/app.php
-    const serviceUrlDefault: string = '/tops/service/execute/{sid}/{arg}';
+    const serviceUrlDefault: string = '/tops/service/execute';
 
     export class mailBox {
         id:string;
@@ -178,6 +178,7 @@ module Tops {
             var me = this;
             me.viewModel = currentViewModel;
             me.peanut = new Tops.Peanut(me);
+            messageManager.instance = new messageManager();
             Application.current = me;
         }
 
@@ -188,7 +189,7 @@ module Tops {
         viewModel: any;
         componentLoader: TkoComponentLoader = null;
 
-        serviceUrl: string = serviceUrlDefault;
+        serviceUrl: string = '';
 
         public getHtmlTemplate(name: string, successFunction: (htmlSource: string) => void) {
             var parts = name.split('-');
@@ -460,8 +461,6 @@ module Tops {
         public initialize( successFunction?: () => void) {
             var me = this;
             me.setApplicationPath();
-            me.serviceUrl = me.applicationPath +  me.serviceUrl;
-            messageManager.instance = new messageManager();
             me.registerAndBindComponent('service-messages',messageManager.instance, function() {
                 me.loadWaitMessageTemplate('spin-waiter', function () {
                     me.loadWaitMessageTemplate('progress-waiter', function () {
@@ -484,6 +483,7 @@ module Tops {
             }
             me.siteUrl = location.protocol + '//' + location.hostname + port;
             me.applicationPath = me.siteUrl + appRootPath;
+            me.serviceUrl = me.siteUrl + serviceUrlDefault;
         }
 
         showServiceMessages(messages: Tops.IServiceMessage[]): void {

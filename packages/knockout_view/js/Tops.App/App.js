@@ -13,7 +13,7 @@ var Tops;
     var corePath = '/packages/knockout_view/js/';
     var appRootPath = '/application/mvvm/';
     // see routing declarations in /application/app.php
-    var serviceUrlDefault = '/tops/service/execute/{sid}/{arg}';
+    var serviceUrlDefault = '/tops/service/execute';
     var mailBox = (function () {
         function mailBox() {
         }
@@ -164,7 +164,7 @@ var Tops;
             this.siteUrl = '';
             this.applicationPath = '';
             this.componentLoader = null;
-            this.serviceUrl = serviceUrlDefault;
+            this.serviceUrl = '';
             /**
              * load template and register instance. Instance argumnent may be a function returning an instance or the instance itself.
              * Bind assuming outer div with id of "[component name]-container"
@@ -195,6 +195,7 @@ var Tops;
             var me = this;
             me.viewModel = currentViewModel;
             me.peanut = new Tops.Peanut(me);
+            messageManager.instance = new messageManager();
             Application.current = me;
         }
         Application.prototype.getHtmlTemplate = function (name, successFunction) {
@@ -409,8 +410,6 @@ var Tops;
         Application.prototype.initialize = function (successFunction) {
             var me = this;
             me.setApplicationPath();
-            me.serviceUrl = me.applicationPath + me.serviceUrl;
-            messageManager.instance = new messageManager();
             me.registerAndBindComponent('service-messages', messageManager.instance, function () {
                 me.loadWaitMessageTemplate('spin-waiter', function () {
                     me.loadWaitMessageTemplate('progress-waiter', function () {
@@ -432,6 +431,7 @@ var Tops;
             }
             me.siteUrl = location.protocol + '//' + location.hostname + port;
             me.applicationPath = me.siteUrl + appRootPath;
+            me.serviceUrl = me.siteUrl + serviceUrlDefault;
         };
         Application.prototype.showServiceMessages = function (messages) {
             messageManager.instance.setServiceMessages(messages);

@@ -30,9 +30,10 @@ module Tops {
             // alert('Hello World');
             var me  = this;
 
-            alert('Hello World.');
-            /*
-            me.peanut.executeService('HelloWorld',null, function(serviceResponse: Tops.IServiceResponse) {
+            // alert('Hello World.');
+            let params = {'Planet' : 'mars'};
+
+            me.peanut.executeService('HelloWorld',params, function(serviceResponse: Tops.IServiceResponse) {
                 me.application.hideWaiter();
                 if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
                     alert('Success!');
@@ -41,7 +42,7 @@ module Tops {
             }).fail(function() {
                 alert('Failed');
             });
-            */
+
         }
 
         /**

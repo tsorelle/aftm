@@ -1,8 +1,8 @@
 /**
  * Created by Terry on 2/19/2015.
  */
-///<reference path='../../../../application/js/typings/knockout/knockout.d.ts' />
-///<reference path='../../../../application/js/typings/jquery/jquery.d.ts' />
+///<reference path='../../../../application/mvvm/typings/knockout/knockout.d.ts' />
+///<reference path='../../../../application/mvvm/typings/jquery/jquery.d.ts' />
 ///<reference path='Peanut.d.ts' />
 ///<reference path='Debugging.ts' />
 var Tops;
@@ -212,7 +212,10 @@ var Tops;
             else {
                 parameters = JSON.stringify(parameters);
             }
-            var serviceRequest = { "serviceCode": serviceName, "topsSecurityToken": _peanut.securityToken, "request": parameters };
+            //todo: implement security token
+            var serviceRequest = { "serviceCode": serviceName,
+                // "topsSecurityToken": _peanut.securityToken,
+                "request": parameters };
             var serviceUrl = _peanut.clientApp.serviceUrl; // Drupal 8/7: tops/service, Drupal 6 or PHP: 'topsService.php';
             var result = jQuery.ajax({
                 type: requestMethod,

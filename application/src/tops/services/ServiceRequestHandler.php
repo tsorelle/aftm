@@ -31,19 +31,19 @@ class ServiceRequestHandler extends Controller
          */
         $th = Core::make('helper/text');
         $request = Request::getInstance();
-        $serviceId = $request->get('sid');
-        $serviceId = $th->sanitize($serviceId);
-        $input = $request->get('arg');
         $method = $request->getMethod();
 
-        if (empty($input)) {
-            $input = 'no input';
-        }
-        else if ($method=='POST') {
+        if ($method=='POST') {
+            $serviceId = $request->get('serviceCode');
+            $input = $request->get('request');
             $input = json_decode($input);
-
+            // $serviceId = $input->serviceCode;
+            // $input = isset($input->parameters) ? $input->parameters : null;
         }
         else {
+            $serviceId = $request->get('sid');
+            $serviceId = $th->sanitize($serviceId);
+            $input = $request->get('arg');
             $input = $th->sanitize($input);
         }
 
@@ -67,7 +67,9 @@ class ServiceRequestHandler extends Controller
          * @var $cmd TServiceCommand
          */
         $cmd = new $className();
-        $cmd->execute($input);
+        $response = $cmd->execute($input);
+        echo json_encode($response);
+
         
     }
 

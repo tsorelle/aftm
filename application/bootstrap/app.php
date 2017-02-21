@@ -98,6 +98,12 @@ Route::register(
 );
 
 Route::register(
+    '/tops/service/execute',
+    'Application\Tops\services\ServiceRequestHandler::executeService'
+);
+
+
+Route::register(
     '/tops/service/execute/{sid}',
     'Application\Tops\services\ServiceRequestHandler::executeService'
 );

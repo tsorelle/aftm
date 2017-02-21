@@ -1,10 +1,13 @@
 /**
  * Created by Terry on 2/19/2015.
  */
-///<reference path='../typings/knockout/knockout.d.ts' />
-/// <reference path="./App.ts" />
-/// <reference path="../Tops.Peanut/Peanut.ts" />
-///<reference path='../Tops.Peanut/Peanut.d.ts' />
+/// <reference path='../typings/jquery/jquery.d.ts' />
+/// <reference path="../typings/knockout/knockout.d.ts" />
+/// <reference path="../typings/custom/head.load.d.ts" />
+/// <reference path="../../../packages/knockout_view/js/Tops.App/App.ts" />
+/// <reference path="../../../packages/knockout_view/js/Tops.Peanut/Peanut.ts" />
+/// <reference path="../../../packages/knockout_view/js/Tops.Peanut/Peanut.d.ts" />
+
 // Module
 module Tops {
 
@@ -78,11 +81,11 @@ module Tops {
         // test() { alert("hello"); }
 
         // call this funtions at end of page
-        init(applicationPath: string, successFunction?: () => void) {
+        init(successFunction?: () => void) {
             var me = this;
 
             // setup messaging and other application initializations
-            me.application.initialize(applicationPath,
+            me.application.initialize(
             function() {
                     // me.clearPerson();
                     me.application.showMessage("initialized");
