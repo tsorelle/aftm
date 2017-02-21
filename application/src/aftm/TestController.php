@@ -9,6 +9,7 @@
 namespace Application\Aftm;
 
 use Application\Aftm\AftmConfiguration;
+use Application\Aftm\concrete\AftmFileManager;
 use Concrete\Core\Controller\Controller;
 use Concrete\Core\Http\Request;
 use Core;
@@ -25,23 +26,14 @@ class TestController extends Controller
 
 
     public function doTest() {
-        $formData = new \stdClass();
-        $formData->donor_first_name           = 'Terry';
-        $formData->donor_last_name            = 'SoRelle';
-        $formData->donor_address1             = '904 E. Meadowmere';
-        $formData->donor_address2             = '';
-        $formData->donor_city                 = 'Austin';
-        $formData->donor_state                = 'TX';
-        $formData->donor_zipcode              = '78758';
-        $formData->donor_email                = 'tls@2quakers.net';
-        $formData->donor_phone                = '512-789-7321';
-        $formData->donation_invoice_number   = '0000000028';
+        $setName = 'Minutes';
+        $result = AftmFileManager::GetFilesBySet($setName,'month');
+        if ($result === false) {
+            exit('No set');
+        }
 
-        $invoice = '0000000028';
-        AftmDonationEntityManager::UpdatePayment($invoice,'10.38');
 
         echo "<br>Done<br>";
-
     }
 
 
