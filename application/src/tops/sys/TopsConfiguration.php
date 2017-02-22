@@ -52,7 +52,7 @@ class TopsConfiguration
     public static function getIniManager()
     {
         if (!isset(self::$iniManager)) {
-            $p = realpath(__DIR__.'\..');
+            $p = __DIR__; // realpath(__DIR__.'\..');
 
 
             self::$iniManager = new ConfigurationManager($p.DIRECTORY_SEPARATOR."config.ini");

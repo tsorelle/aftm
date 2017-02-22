@@ -1,0 +1,26 @@
+<div class="row" style="padding-top: 10px">
+    <div class="col-md-12">
+        <h2>AFTM Reel Times Newsletter</h2>
+    </div>
+</div>
+<div class="row" style="padding-top: 10px">
+    <div class="col-md-4" >
+        <div style="overflow: scroll; padding-top: 5px; border: 1px solid black; height: 600px; min-height: 600px" class="hidden-xs hidden-sm">
+            <ul data-bind="foreach:files" >
+                <li>
+                    <a href="#" data-bind="click:$parent.selectFile"><span data-bind="text:title"></span> </a>
+                </li>
+            </ul>
+        </div>
+        <div class="hidden-md hidden-lg" style="padding-top: 6px; padding-bottom: 6px">
+            <select data-bind="options: files, optionsText: 'title', value:selectedDoc"></select>
+        </div>
+    </div>
+    <div class="col-md-8" style="border: 1px double black;padding:0">
+        <div data-bind="visible:docUrl">
+            <iframe data-bind="attr: {src: docUrl}"
+                width="100%" height="1000" style="border: none;">
+            </iframe>
+        </div>
+    </div>
+</div>

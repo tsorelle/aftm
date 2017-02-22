@@ -57,7 +57,7 @@ class ServiceRequestHandler extends Controller
             $serviceId = $parts[1];
         }
 
-        $className = $namespace."\\".$serviceId.'Service';
+        $className = $namespace."\\".$serviceId.'Command';
 
         if (!class_exists($className)) {
             throw new \Exception("Cannot instatiate service '$className'.");

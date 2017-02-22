@@ -11,7 +11,7 @@ namespace Application\Aftm\services;
 
 use Application\Tops\services\TServiceCommand;
 
-class HelloWorldService  extends TServiceCommand
+class HelloWorldCommand  extends TServiceCommand
 {
 
     protected function run()

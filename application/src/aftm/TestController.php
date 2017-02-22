@@ -26,10 +26,15 @@ class TestController extends Controller
 
 
     public function doTest() {
-        $setName = 'Minutes';
-        $result = AftmFileManager::GetFilesBySet($setName,'month');
+        $setName = 'Newsletters';
+
+        $result = AftmFileManager::GetFilesBySet($setName);
         if ($result === false) {
             exit('No set');
+        }
+
+        foreach ($result as $f) {
+            echo "<p>$f->title</p>";
         }
 
 
