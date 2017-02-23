@@ -32,7 +32,7 @@ module Tops {
 
             // alert('Hello World.');
             let params = {'Planet' : 'mars'};
-
+            me.application.showWaiter('Loading');
             me.peanut.executeService('HelloWorld',params, function(serviceResponse: Tops.IServiceResponse) {
                 me.application.hideWaiter();
                 if (serviceResponse.Result == Tops.Peanut.serviceResultSuccess) {
