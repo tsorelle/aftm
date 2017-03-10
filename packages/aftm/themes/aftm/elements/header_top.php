@@ -3,6 +3,8 @@
 <html lang="<?php  echo Localization::activeLanguage()?>">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" href="/packages/aftm/themes/aftm/images/aftm16.ico" type="image/x-icon" />
+    <link rel="icon" href="/packages/aftm/themes/aftm/images/aftm16.ico" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="<?php  echo $view->getThemePath()?>/css/bootstrap-modified.css">
     <?php  echo $html->css($view->getStylesheet('main.less'))?>
     <?php  Loader::element('header_required', array('pageTitle' => isset($pageTitle) ? $pageTitle : '', 'pageDescription' => isset($pageDescription) ? $pageDescription : '')); ?>
