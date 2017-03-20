@@ -10,6 +10,7 @@ class PageTheme extends \Concrete\Core\Page\Theme\Theme implements ThemeProvider
         $this->providesAsset('css', 'bootstrap/*');
         $this->requireAsset('javascript', 'bootstrap/collapse');
         $this->requireAsset('javascript', 'bootstrap/tooltip');
+        $this->requireAsset('javascript', 'bootstrap/modals');  // registered in /packages/aftm/controller.php
         $this->providesAsset('css', 'blocks/form');
         $this->providesAsset('css', 'blocks/social_links');
         $this->providesAsset('css', 'blocks/share_this_page');
