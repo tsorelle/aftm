@@ -1,4 +1,4 @@
-///<reference path="../../../../application/mvvm/typings/jquery/jquery.d.ts"/>
+ ///<reference path="../../../../application/mvvm/typings/jquery/jquery.d.ts"/>
 /**
  * Created by Terry on 3/8/2017.
  */

@@ -491,12 +491,10 @@ var Tops;
         };
         Application.prototype.showWaiter = function (message) {
             if (message === void 0) { message = "Please wait . . ."; }
-            // todo: implement for C5
-            // waitMessage.show(message);
+            waitMessage.show(message);
         };
         Application.prototype.hideWaiter = function () {
-            // todo: implement for C5
-            // waitMessage.hide();
+            waitMessage.hide();
         };
         Application.prototype.showProgress = function (message) {
             if (message === void 0) { message = "Please wait . . ."; }

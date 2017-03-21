@@ -10,6 +10,7 @@
 /// <reference path="../../../packages/knockout_view/js/Tops.Peanut/Peanut.d.ts" />
 
 module Tops {
+
     export class HelloWorldViewModel implements IMainViewModel {
         static instance: Tops.HelloWorldViewModel;
         private application: Tops.IPeanutClient;

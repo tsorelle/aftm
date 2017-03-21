@@ -1,0 +1,8 @@
+# Created by .ignore support plugin (hsz.mobi)
+concrete/*
+updates/*
+application/files/*
+test/*
+packages/*
+!packages/aftm
+!packages/knockout_view

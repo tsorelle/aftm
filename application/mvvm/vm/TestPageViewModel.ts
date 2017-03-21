@@ -11,7 +11,6 @@
 // Module
 module Tops {
 
-//hello
 
     // view model
     export class TestPageViewModel implements IMainViewModel {
@@ -136,6 +135,16 @@ module Tops {
         }
 
         onShowWaiter() {
+            let me = this;
+            me.application.showWaiter();
+            var t = window.setInterval(function() {
+                    clearInterval(t);
+                    me.application.hideWaiter();
+            }, 1000);
+
+        }
+
+        onShowProgressWaiter() {
             var count = 0;
             Tops.waitMessage.show("Hello " + (new Date()).toISOString(), 'progress-waiter');
             var t = window.setInterval(function() {
@@ -159,4 +168,4 @@ module Tops {
 }
 
 Tops.TestPageViewModel.instance = new Tops.TestPageViewModel();
-(<any>window).ViewModel = Tops.TestPageViewModel.instance;
+(<any>window).TestPageViewModel = Tops.TestPageViewModel.instance;

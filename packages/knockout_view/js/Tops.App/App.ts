@@ -552,13 +552,11 @@ module Tops {
 
 
         public showWaiter(message: string = "Please wait . . .") {
-            // todo: implement for C5
-            // waitMessage.show(message);
+            waitMessage.show(message);
         }
 
         public hideWaiter() {
-            // todo: implement for C5
-            // waitMessage.hide();
+            waitMessage.hide();
         }
 
         public showProgress(message: string = "Please wait . . .") {
