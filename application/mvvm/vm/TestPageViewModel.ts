@@ -82,15 +82,10 @@ module Tops {
         // call this funtions at end of page
         init(successFunction?: () => void) {
             var me = this;
-
             // setup messaging and other application initializations
             me.application.initialize(
-            function() {
-                    // me.clearPerson();
-                    me.application.showMessage("initialized");
-                    if (successFunction) {
-                        successFunction();
-                    }
+                function() {
+                    me.application.loadComponent('modal-confirm', successFunction);
                 }
             );
         }
@@ -164,6 +159,21 @@ module Tops {
             Tops.waitMessage.hide();
 
         }
+
+        onShowModalForm() {
+            jQuery("#test-modal").modal('show');
+        }
+
+        onSaveChanges() {
+            jQuery("#test-modal").modal('hide');
+            jQuery("#confirm-save-modal").modal('show');
+        }
+
+        save = () => {
+            jQuery("#confirm-save-modal").modal('hide');
+            alert('you saved');
+        };
+
     }
 }
 
