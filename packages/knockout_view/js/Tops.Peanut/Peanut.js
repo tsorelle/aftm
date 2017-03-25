@@ -19,12 +19,12 @@ var Tops;
     var editState = (function () {
         function editState() {
         }
-        editState.unchanged = 0;
-        editState.created = 1;
-        editState.updated = 2;
-        editState.deleted = 3;
         return editState;
     }());
+    editState.unchanged = 0;
+    editState.created = 1;
+    editState.updated = 2;
+    editState.deleted = 3;
     Tops.editState = editState;
     /**
      * Use for testing. Normally IServiceResponse is returned from a service
@@ -358,20 +358,20 @@ var Tops;
             }
         };
         ;
-        // private foo: any;
-        // private serviceType: string = 'php';
-        Peanut.allMessagesType = -1;
-        Peanut.infoMessageType = 0;
-        Peanut.errorMessageType = 1;
-        Peanut.warningMessageType = 2;
-        Peanut.serviceResultSuccess = 0;
-        Peanut.serviceResultPending = 1;
-        Peanut.serviceResultWarnings = 2;
-        Peanut.serviceResultErrors = 3;
-        Peanut.serviceResultServiceFailure = 4;
-        Peanut.serviceResultServiceNotAvailable = 5;
         return Peanut;
     }());
+    // private foo: any;
+    // private serviceType: string = 'php';
+    Peanut.allMessagesType = -1;
+    Peanut.infoMessageType = 0;
+    Peanut.errorMessageType = 1;
+    Peanut.warningMessageType = 2;
+    Peanut.serviceResultSuccess = 0;
+    Peanut.serviceResultPending = 1;
+    Peanut.serviceResultWarnings = 2;
+    Peanut.serviceResultErrors = 3;
+    Peanut.serviceResultServiceFailure = 4;
+    Peanut.serviceResultServiceNotAvailable = 5;
     Tops.Peanut = Peanut;
 })(Tops || (Tops = {}));
 //# sourceMappingURL=Peanut.js.map

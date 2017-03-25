@@ -25,7 +25,6 @@ module Tops {
 
         // Constructor
         constructor() {
-
             var me = this;
             Tops.NewslettersViewModel.instance = me;
             me.application = new Tops.Application(me);
@@ -65,17 +64,16 @@ module Tops {
                     }
                 }
             }).fail(function() {
-                alert('Failed');
+                alert('Service Failed');
             });
         }
 
         /**
-         * @param applicationPath - root path of application or location of service script
          * @param successFunction - page inittializations such as ko.applyBindings() go here.
          *
          * Call this function in a script at the end of the page following the closing "body" tag.
          * e.g.
-         *      ViewModel.init('/', function() {
+         *      ViewModel.init(function() {
          *          ko.applyBindings(ViewModel);
          *      });
          *

@@ -68,12 +68,12 @@ var Tops;
                 waitMessage.visible = false;
             }
         };
-        waitMessage.waitDialog = null;
-        waitMessage.waiterType = 'spin-waiter';
-        waitMessage.templates = Array();
-        waitMessage.visible = false;
         return waitMessage;
     }());
+    waitMessage.waitDialog = null;
+    waitMessage.waiterType = 'spin-waiter';
+    waitMessage.templates = Array();
+    waitMessage.visible = false;
     Tops.waitMessage = waitMessage;
     var messageManager = (function () {
         function messageManager() {
@@ -152,11 +152,11 @@ var Tops;
                 _this.infoMessages(infoArray);
             };
         }
-        messageManager.errorClass = "service-message-error";
-        messageManager.infoClass = "service-message-information";
-        messageManager.warningClass = "service-message-warning";
         return messageManager;
     }());
+    messageManager.errorClass = "service-message-error";
+    messageManager.infoClass = "service-message-information";
+    messageManager.warningClass = "service-message-warning";
     // Class
     var Application = (function () {
         function Application(currentViewModel) {
@@ -503,10 +503,10 @@ var Tops;
         Application.prototype.setProgress = function (count) {
             waitMessage.setProgress(count);
         };
-        Application.versionNumber = "1.0";
-        Application.defaultSectionId = 'tops-view-section';
         return Application;
     }());
+    Application.versionNumber = "1.0";
+    Application.defaultSectionId = 'tops-view-section';
     Tops.Application = Application;
 })(Tops || (Tops = {}));
 //# sourceMappingURL=App.js.map
