@@ -8,13 +8,13 @@
 
 namespace Application\Block\ExternalForm\Form\Controller;
 
+use Application\Aftm\AftmDonationManager;
 use Application\Aftm\AftmMailManager;
 use Core;
 use Concrete\Core\Controller\AbstractController;
 use Concrete\Core\Http\Request;
 use Application\Aftm\AftmConfiguration;
 use Application\Aftm\AftmInvoiceManager;
-use Application\Aftm\AftmDonationEntityManager;
 use Application\Aftm\PayPalForm;
 use Application\Aftm\AftmCatalogManager;
 use Concrete\Core\Utility\Service\Text;
@@ -40,7 +40,6 @@ class AftmDonationForm extends AbstractController
     private function clearFormData() {
         $formData = new \stdClass();
         $formData->payment_method              = 'paypal';
-        // $formData->donation_amount            = '';
         $formData->donor_first_name           = '';
         $formData->donor_last_name            = '';
         $formData->donor_address1             = '';
@@ -209,7 +208,7 @@ class AftmDonationForm extends AbstractController
             }
 
             $formData->donation_invoice_number = $this->postInvoice($formData);
-            AftmDonationEntityManager::AddDonation($formData);
+            AftmDonationManager::AddDonation($formData);
 
             $donorName = $formData->donor_first_name.' '.$formData->donor_last_name;
             $formData->donorId = $donorName;

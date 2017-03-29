@@ -11,7 +11,6 @@
             <key/>
         </field>
         <field name="invoicenumber" type="string" size="20">
-            <notnull/>
         </field>
         <field name="invoicedate" type="datetime">
             <default value="CURRENT_TIMESTAMP"/>
@@ -22,8 +21,6 @@
             <notnull/>
         </field>
         <field name="paiddate" type="datetime">
-            <default value="0000-00-00 00:00:00"/>
-            <notnull/>
         </field>
         <field name="paymentmethod" type="string" size="10">
             <default value="check"/>
@@ -108,4 +105,43 @@
             <notnull/>
         </field>
     </table>
+    <table name="aftmdonations">
+        <field name="id" type="integer" size="10">
+            <unsigned/>
+            <autoincrement/>
+            <key/>
+        </field>
+        <field name="firstname" type="string" size="255">
+        </field>
+        <field name="lastname" type="string" size="255">
+        </field>
+        <field name="address1" type="string" size="255">
+        </field>
+        <field name="address2" type="string" size="255">
+        </field>
+        <field name="city" type="string" size="255">
+        </field>
+        <field name="state" type="string" size="255">
+        </field>
+        <field name="postalcode" type="string" size="255">
+        </field>
+        <field name="email" type="string" size="255">
+        </field>
+        <field name="phone" type="string" size="255">
+        </field>
+        <field name="donationnumber" type="string" size="255">
+        </field>
+
+        <field name="amount" type="decimal" size="10.2">
+        </field>
+        <field name="datereceived" type="datetime">
+        </field>
+
+        <field name="notes" type="text" >
+        </field>
+        <field name="paypalmemo" type="text">
+        </field>
+
+    </table>
+
 </schema>

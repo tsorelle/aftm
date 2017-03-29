@@ -26,6 +26,30 @@ class TestController extends Controller
 
 
     public function doTest() {
+
+        $donationData = new \stdClass();
+
+        $donationData->donor_first_name   = 'Terry';
+        $donationData->donor_last_name    = 'SoRelle';
+        $donationData->donation_invoice_number = '00009999';
+        $donationData->donor_address1     = 'Address 1';
+        $donationData->donor_address2     = 'Address 2';
+        $donationData->donor_city        = 'Austin';
+        $donationData->donor_state        = 'TX';
+        $donationData->donor_zipcode      = '78767';
+        $donationData->donor_email       = 'e@mail.com';
+        $donationData->donor_phone       = '512-909-0292';
+
+        AftmDonationManager::AddDonation($donationData);
+
+        $result = AftmDonationManager::UpdatePayment($donationData->donation_invoice_number,256.90,'Paypal says ok!');
+
+
+        echo "<br>Done<br>";
+    }
+
+
+    public function fileSetTest() {
         $setName = 'Newsletters';
 
         $result = AftmFileManager::GetFilesBySet($setName);

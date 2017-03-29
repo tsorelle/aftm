@@ -16,6 +16,7 @@ use Concrete\Core\Support\Facade\Express;
 use Concrete\Core\Entity\Express\Entity;
 use Concrete\Core\Express\Entry\Search\Result\Result;
 use Concrete\Core\Express\EntryList;
+use Application\Aftm\AftmDonationManager;
 
 
 class IpnControllerDonation extends IpnControllerBase
@@ -188,24 +189,23 @@ class IpnControllerDonation extends IpnControllerBase
     function updateData($inputs)
     {
         if (isset($inputs->invoice) && isset($inputs->invoice->invoicenumber) ) {
-            $entry = AftmDonationEntityManager::UpdatePayment($inputs->invoice->invoicenumber,$inputs->request->payment_amount);
+            $entry = AftmDonationManager::UpdatePayment($inputs->invoice->invoicenumber,$inputs->request->payment_amount);
             if ($entry === false) {
                 $message = "Warning: No donation entry found for invoice number '$inputs->invoice->invoicenumber'.";
                 $this->addWarning( $message);
                 $this->writeLog($message);
                 return false;
             }
-            $entry = Express::refresh($entry);
             $donation = new \stdClass();
-            $donation->donor_first_name           = $entry->getAttribute('donor_first_name');
-            $donation->donor_last_name            = $entry->getAttribute('donor_last_name');
-            $donation->donor_address1             = $entry->getAttribute('donor_address1');
-            $donation->donor_address2             = $entry->getAttribute('donor_address2');
-            $donation->donor_city                 = $entry->getAttribute('donor_city');
-            $donation->donor_state                = $entry->getAttribute('donor_state');
-            $donation->donor_zipcode              = $entry->getAttribute('donor_postal_code');
-            $donation->donor_phone                = $entry->getAttribute('donor_phone');
-            $donation->donor_email = $entry->getAttribute('donor_email');
+            $donation->donor_first_name           = $entry->firstname;
+            $donation->donor_last_name            = $entry->lastname;
+            $donation->donor_address1             = $entry->address1;
+            $donation->donor_address2             = $entry->address2;
+            $donation->donor_city                 = $entry->city;
+            $donation->donor_state                = $entry->state;
+            $donation->donor_zipcode              = $entry->postalcode;
+            $donation->donor_phone                = $entry->phone;
+            $donation->donor_email                =  $entry->email;
 
 
             $inputs->donation = $donation;
