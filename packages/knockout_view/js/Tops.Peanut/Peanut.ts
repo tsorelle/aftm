@@ -247,6 +247,25 @@ module Tops {
         }
 
 
+        getSecurityToken(successFunction?: (serviceResponse: IServiceResponse) => void) {
+            var _peanut = this;
+            var serviceRequest = { "serviceCode" : 'getxsstoken'};
+            var serviceUrl =  _peanut.clientApp.serviceUrl; // Drupal 8/7: tops/service, Drupal 6 or PHP: 'topsService.php';
+            var result =
+                jQuery.ajax({
+                    type: "POST",
+                    data: serviceRequest,
+                    dataType: "json",
+                    cache: false,
+                    url: serviceUrl
+                })
+                .done(
+                    successFunction
+                );
+
+            return result;
+        }
+
         executeRPC(requestMethod: string, serviceName: string, parameters: any = "",
                        successFunction?: (serviceResponse: IServiceResponse) => void,
                        errorFunction?: (errorMessage: string) => void) : JQueryPromise<any> {
@@ -263,7 +282,7 @@ module Tops {
 
             //todo: implement security token
             var serviceRequest = { "serviceCode" : serviceName,
-                // "topsSecurityToken": _peanut.securityToken,
+                "topsSecurityToken": _peanut.securityToken,
                 "request" : parameters};
 
             var serviceUrl =  _peanut.clientApp.serviceUrl; // Drupal 8/7: tops/service, Drupal 6 or PHP: 'topsService.php';

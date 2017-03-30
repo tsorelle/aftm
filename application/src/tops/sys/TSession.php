@@ -42,6 +42,7 @@ class TSession
         if (!isset($_SESSION['tops']['security-token'])) {
             $_SESSION['tops']['security-token'] = self::createToken();
         }
+        // setcookie('peanutSecurity','fakexssatack');
         setcookie('peanutSecurity',$_SESSION['tops']['security-token']);
     }
 
@@ -80,14 +81,8 @@ class TSession
 
     public static function AuthenitcateSecurityToken($token)
     {
-        return true; // implement security tokens
-
-        if (empty($token)) {
-            // empty token means no authentication required.
-            return true;
-        }
-
         $currentToken = self::Get('security-token');
+
         if (empty($currentToken)) {
             // no stored token means no authentication required.
             return true;

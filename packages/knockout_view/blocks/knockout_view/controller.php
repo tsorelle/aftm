@@ -1,6 +1,7 @@
 <?php
 namespace Concrete\Package\KnockoutView\Block\KnockoutView;
 
+use Application\Tops\sys\TSession;
 use Concrete\Core\Block\BlockController;
 use Page;
 
@@ -142,8 +143,9 @@ class Controller extends BlockController
                 '<script src="' . $vm->path . '"></script>' .
                 '<script>' . $vm->classname . '.init(function() {' . $vm->classname . '.application.bindSection(\'' . $vm->wrapperid . '\'); });</script>'
             );
+            // init security token
+            TSession::Initialize();
         }
-
     }
 
     public function add()

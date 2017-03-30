@@ -25,6 +25,20 @@ use Application\Tops\sys;
 
 class ServiceRequestHandler extends Controller
 {
+
+    private function getSecurityToken(Request $request) {
+
+        $tokensEnabled = sys\TopsConfiguration::getValue('xxstokens','security',true);
+        if ($request != null && $tokensEnabled) {
+            $securityToken = $request->get('topsSecurityToken');
+            if (!$securityToken) {
+                return 'invalid';
+            }
+        }
+        return '';
+    }
+
+
     public function executeService() {
         $response = '';
         try {
@@ -39,8 +53,6 @@ class ServiceRequestHandler extends Controller
                 $serviceId = $request->get('serviceCode');
                 $input = $request->get('request');
                 $input = json_decode($input);
-                // $serviceId = $input->serviceCode;
-                // $input = isset($input->parameters) ? $input->parameters : null;
             } else {
                 $serviceId = $request->get('sid');
                 $serviceId = $th->sanitize($serviceId);
@@ -48,9 +60,16 @@ class ServiceRequestHandler extends Controller
                 $input = $th->sanitize($input);
             }
 
+            if ($serviceId == 'getxsstoken') {
+                sys\TSession::Initialize();
+                return;
+            }
+
+            $securityToken = $request->get('topsSecurityToken');
+
             $parts = explode('::', $serviceId);
             if (sizeof($parts) == 1) {
-                $namespace = sys\TopsConfiguration::getValue('applicationNamespace', 'services');
+                $namespace =  sys\TopsConfiguration::getValue('applicationNamespace', 'services');
             } else {
                 $namespace = $parts[0];
                 $namespace = "\\Concrete\\Package\\$namespace\\Src\\Services";
@@ -67,11 +86,11 @@ class ServiceRequestHandler extends Controller
              * @var $cmd TServiceCommand
              */
             $cmd = new $className();
-            $response = $cmd->execute($input);
+            $response = $cmd->execute($input,$securityToken);
 
         }
         catch (\Exception $ex) {
-            // todo: exception handling
+            // todo: exception logging
             /*
             $rethrow = $instance->handleException($ex);
             if ($rethrow) {
