@@ -7,11 +7,13 @@
  */
 
 namespace Application\Tops\services;
+use Application\Tops\sys\IUser;
 use Application\Tops\sys\TSession;
 // use Application\Tops\sys\IUser;
 //  use Application\Tops\sys\TTracer;
 // use Application\Tops\sys\TUser;
 use Application\Tops\sys\IMessageContainer;
+use Application\Tops\sys\TUser;
 
 /**
  * Class TServiceCommand
@@ -109,8 +111,6 @@ abstract class TServiceCommand {
      * @return IUser
      */
     protected function getUser() {
-        // todo:implement user object
-        return false;
         if (!isset($this->user)) {
             $this->user = TUser::getCurrent();
         }
@@ -119,13 +119,12 @@ abstract class TServiceCommand {
 
 
     public function isAuthorized() {
-        // todo:implement authorization
-        if (empty($this->authorizations))
+        if (empty($this->authorizations)) {
             return true;
+        }
         /**
          * @var IUser $user
          */
-/*
         $user = $this->getUser();
         if ($user->isAdmin()) {
             return true;
@@ -135,10 +134,18 @@ abstract class TServiceCommand {
                 return true;
             }
         }
-*/
+
         return false;
     }
 
+    /**
+     * @param $authorization
+     *
+     * Use in constructor.  Example:
+     *     public function __construct() {
+     *         $this->addAuthorization("administer registrations");
+     *     }
+     */
     protected function addAuthorization($authorization) {
         if (!in_array($authorization, $this->authorizations)) {
             array_push($this->authorizations, $authorization);
