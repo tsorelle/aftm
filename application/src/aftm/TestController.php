@@ -10,6 +10,10 @@ namespace Application\Aftm;
 
 use Application\Aftm\AftmConfiguration;
 use Application\Aftm\concrete\AftmFileManager;
+use Application\Tops\sys\IUser;
+use Application\Tops\sys\IUserFactory;
+use Application\Tops\sys\TObjectContainer;
+use Application\Tops\sys\TUser;
 use Concrete\Core\Controller\Controller;
 use Concrete\Core\Http\Request;
 use Core;
@@ -24,8 +28,39 @@ use Concrete\Core\Express\EntryList;
 class TestController extends Controller
 {
 
+    public function doTest()
+    {
+        $user = TUser::GetCurrent();
+        if ($user->isAuthenticated()) {
+            echo '<br>'. ($user->isAdmin() ? 'Administrator' : 'Authenticated user').'<br>';
+            echo "<br>Email: " . $user->getEmail() . "<br>";
+        }
+        else {
+            echo "<br>Not authenticated<br>";
+        }
+        echo "<br>This user ".
+         ($user->isAuthorized('donations.edit') ? "CAN" : "CANNOT").
+            " edit donations<br>";
+        echo "<br>Done<br>";
+    }
+    public function factoryTest()
+    {
+        /**
+         * @var $factory IUserFactory
+         */
+        $factory = TObjectContainer::Get('tops.userfactory');
 
-    public function doTest() {
+        /**
+         * @var $user IUser
+         */
+        $user = $factory->createUser();
+
+        echo "<br>". $user->getEmail()."<br>";
+
+        echo "<br>Done<br>";
+    }
+
+    public function donationTest() {
 
         $donationData = new \stdClass();
 
