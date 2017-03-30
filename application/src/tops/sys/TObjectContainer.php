@@ -13,7 +13,7 @@ namespace Application\Tops\sys;
  * @package Application\Tops\sys
  *
  * Temporary "poor man's" dependency injection
- * Only support parameterless singleton instances.
+ * Only supports parameterless singleton instances.
  */
 class TObjectContainer
 {
