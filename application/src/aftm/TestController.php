@@ -30,6 +30,35 @@ class TestController extends Controller
 
     public function doTest()
     {
+        $years = AftmDonationManager::GetDonationYearList();
+
+        print "<pre>";
+        print_r($years);
+        print "</pre>";
+
+        // $donations = AftmDonationManager::GetDonationList(2016);
+        // $all = AftmDonationManager::GetDonationList();
+        /*
+         /$donation = AftmDonationManager::GetDonation(1);
+        $donation->firstname = 'Tim';
+        $donation->lastname = 'Tester';
+        $donation->donationnumber = '9999999';
+        $donation->amount = 100.00;
+        $donation->datereceived = date("Y-m-d");
+        $donation->notes = 'updated by test 2';
+        $donation->id = 0;
+        echo (empty($donation->nosuch) ? 'Empty' : 'Failed').'<br>';
+        echo (empty($noncens->nosuch) ? 'Empty' : 'Failed').'<br>';
+        echo (empty($donation->id) ? 'Zero' : 'Failed').'<br>';
+        echo (empty($donation->donationnumber) ? 'Failed' : 'OK').'<br>';
+       // $id = AftmDonationManager::UpdateDonation($donation);
+        */
+
+        echo "<br>Done<br>";
+    }
+
+    public function doTestAuth()
+    {
         $user = TUser::GetCurrent();
         if ($user->isAuthenticated()) {
             echo '<br>'. ($user->isAdmin() ? 'Administrator' : 'Authenticated user').'<br>';
