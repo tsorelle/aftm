@@ -262,7 +262,6 @@ abstract class IpnControllerBase extends Controller
      * Main IPN logic
      */
     private function process() {
-
         $request = Request::getInstance();
         $sandboxMode = $request->get('sandbox');
         $formId = $this->getFormId();
@@ -323,8 +322,10 @@ abstract class IpnControllerBase extends Controller
             if ($this->ipndebug == self::debugLocal) {
                 throw $ex;
             }
-            $msg = "PayPal IPN process failed: ".$ex->getMessage();
+            $msg = sprintf("PayPal IPN process failed in %s(%s): %s",$ex->getMessage(),$ex->getFile(),$ex->getLine());
+            // $msg = "PayPal IPN process failed: ".$ex->getMessage()." ";
             error_log($msg,0); // to php error log
+            $msg .="\n\n".$ex->getTraceAsString();
             error_log($msg,1,'websupport@aftm.us'); // to email
             if ($this->ipndebug != self::debugPhpLog) {
                 // attempt regular ipn logging.
