@@ -48,6 +48,7 @@ class IpnControllerMembership extends IpnControllerBase
         $result->membership_type = $this->getPostValue('option_selection1','(not found)');
         $result->payment_amount = $this->getPostValue('payment_gross');
         $result->member_name = array_key_exists('membername',$custom) ? $custom['membername'] : '(not found)';
+        $result->payment_memo = $this->getPostValue('memo');
 
         $cost = AftmCatalogManager::GetPrice('membership',$result->membership_type);
         if (empty($result->payment_amount)) {
@@ -163,7 +164,8 @@ class IpnControllerMembership extends IpnControllerBase
     function updateData($inputs)
     {
         if (isset($inputs->invoice) && isset($inputs->invoice->invoicenumber) ) {
-            $entry = AftmMemberEntityManager::UpdatePayment($inputs->invoice->invoicenumber);
+            // todo: use database object
+            $entry = AftmMembershipManager::UpdatePayment($inputs->invoice->invoicenumber,$inputs->invoice->cost,$inputs->invoice->payment_memo);
             if ($entry === false) {
                 $message = "Warning: No membership entry found for invoice number '$inputs->invoice->invoicenumber'.";
                 $this->addWarning( $message);
