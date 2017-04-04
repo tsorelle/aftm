@@ -61,6 +61,22 @@ class AftmInvoiceManager
         return $count;
     }
 
+    private function dropInvoice($invoicenumber)
+    {
+        $db = \Database::connection();
+        $sql = 'select id from aftminvoices where invoicenumber = ?';
+        $statement = $db->prepare($sql);
+        $statement->bindValue(1, $invoicenumber);
+        $statement->execute();
+        $result = $statement->fetch();
+        if ($result === false) {
+            return false;
+        }
+        $id = $result['id'];
+        $db->delete('aftminvoiceitems', array('invoiceid' => $id));
+        return $db->delete('aftminvoices', array('id' => $id));
+    }
+
     /**
      * @param $invoicenumber
      * @return bool|\stdClass
@@ -122,4 +138,9 @@ class AftmInvoiceManager
     public static function CheckPaypalTransaction($transactionId) {
         return self::getInstance()->checkPaypalTransactionId($transactionId);
     }
+
+    public static function RemoveInvoice($invoicenumber) {
+        return self::getInstance()->dropInvoice($invoicenumber);
+    }
+
 }

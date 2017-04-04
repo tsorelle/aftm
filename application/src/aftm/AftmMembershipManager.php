@@ -7,7 +7,7 @@
  */
 
 namespace Application\Aftm;
-
+use PDO;
 
 class AftmMembershipManager
 {
@@ -171,6 +171,7 @@ class AftmMembershipManager
             'expirationdate' =>       $membershipData->expirationdate,
             'paymentreceiveddate' =>  $membershipData->paymentreceiveddate
         );
+        return $updateValues;
     }
     public function updateMembershipRecord($membershipData) {
 
@@ -196,12 +197,12 @@ class AftmMembershipManager
         $db = \Database::connection();
         $sql = 'SELECT id,invoicenumber,DATE_FORMAT(reneweddate,\'%Y-%m-%d\') AS reneweddate, membershiptype,firstname,lastname,email  FROM aftmmemberships';
         if ($year) {
-            $sql .= " WHERE YEAR(reneweddate) = ? ORDER BY datereceived DESC";
+            $sql .= " WHERE YEAR(reneweddate) = ? ORDER BY reneweddate,startdate DESC";
             $statement = $db->prepare($sql);
             $statement->bindValue(1, $year);
         }
         else{
-            $sql .= " ORDER BY datereceived DESC";
+            $sql .= " ORDER BY reneweddate,startdate DESC";
             $statement = $db->prepare($sql);
         }
         $statement->execute();
@@ -225,11 +226,17 @@ class AftmMembershipManager
         return $years;
     }
 
+    private function dropMembership($membershipId)
+    {
+        $db = \Database::connection();
+        return $db->delete('aftmmemberships', array('id' => $membershipId));
+    }
+
     public static function GetMemberInterests($memberData) {
         return self::getInstance()->interestsToString($memberData);
     }
     public static function AddMembership($memberData) {
-        self::getInstance()->insertMembershipEntry($memberData);
+        return self::getInstance()->insertMembershipEntry($memberData);
     }
     public static function UpdatePayment($invoiceNumber,$cost,$memo) {
         return self::getInstance()->updatePaymentInfo($invoiceNumber,$cost,$memo);
@@ -252,6 +259,10 @@ class AftmMembershipManager
 
     public static function NewMembership($membershipData) {
         return self::getInstance()->insertMembership($membershipData);
+    }
+
+    public static function RemoveMembership($membershipId) {
+        return self::getInstance()->dropMembership($membershipId);
     }
 
 }

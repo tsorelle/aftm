@@ -64,12 +64,13 @@ abstract class TServiceCommand {
         return ($response == null) ? null : $response->Value;
     }
 
-    public function runTest($request)
+    public function runTest($request = null)
     {
         $this->context = new TServiceContext();
         $this->setRequest($request);
         $this->run();
-        return $this->getReturnValue();
+        return $this->context->GetResponse();
+        // return $this->getReturnValue();
     }
 
     public function getTestResponse($request) {

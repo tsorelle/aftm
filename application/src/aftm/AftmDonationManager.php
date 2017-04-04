@@ -66,9 +66,7 @@ class AftmDonationManager
         return $entry;
     }
 
-
-    public function updateDonationRecord($donationData) {
-
+    private function getUpdateValues($donationData) {
         $updateValues = array(
             'firstname'    		=> $donationData->firstname,
             'lastname'    		=> $donationData->lastname,
@@ -81,12 +79,17 @@ class AftmDonationManager
             'email'    			=> $donationData->email,
             'phone'    			=> $donationData->phone,
             'amount'      		=> $donationData->amount,
-            'datereceived'      => $donationData->datereceived,
+            'datereceived'      => empty($donationData->datereceived) ?  date("Y-m-d") : $donationData->datereceived,
             'notes'             => $donationData->notes,
             'paypalmemo'        => $donationData->paypalmemo  );
 
+        return $updateValues;
 
+    }
 
+    public function updateDonationRecord($donationData) {
+
+        $updateValues = $this->getUpdateValues($donationData);
 
         $db = \Database::connection();
         $count = $db->update('aftmdonations', $updateValues,array('id'=> $donationData->id));
@@ -97,22 +100,7 @@ class AftmDonationManager
 
     public function insertDonation($donationData) {
 
-        $insertValues = array(
-            'firstname'    		=> $donationData->firstname,
-            'lastname'    		=> $donationData->lastname,
-            'donationnumber'    => $donationData->donationnumber,
-            'address1'    		=> $donationData->address1,
-            'address2'    		=> $donationData->address2,
-            'city'    			=> $donationData->city,
-            'state'    			=> $donationData->state,
-            'postalcode'    	=> $donationData->postalcode,
-            'email'    			=> $donationData->email,
-            'phone'    			=> $donationData->phone,
-            'amount'      		=> $donationData->amount,
-            'datereceived'      => $donationData->datereceived,
-            'notes'             => $donationData->notes,
-            'paypalmemo'        => $donationData->paypalmemo  );
-
+        $insertValues = $this->getUpdateValues($donationData);
 
         $db = \Database::connection();
         $db->insert('aftmdonations', $insertValues);
@@ -176,6 +164,12 @@ class AftmDonationManager
         return $donations;
     }
 
+    private function dropDonation($donationId)
+    {
+        $db = \Database::connection();
+        return $db->delete('aftmdonations', array('id' => $donationId));
+    }
+
     public static function AddDonation($donationData) {
         self::getInstance()->insertDonationEntry($donationData);
     }
@@ -201,6 +195,10 @@ class AftmDonationManager
 
     public static function NewDonation($donationData) {
         return self::getInstance()->insertDonation($donationData);
+    }
+
+    public static function RemoveDonation($donationId) {
+        return self::getInstance()->dropDonation($donationId);
     }
 
 

@@ -36,7 +36,7 @@ module Tops {
             let request = {'includePluto' : 1};
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting the solar system...');
-            me.peanut.executeService('GetPlanets',request,
+            me.peanut.executeService('test\\GetPlanets',request,
                 function(serviceResponse: IServiceResponse) {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                         me.planetList = serviceResponse.Value;

@@ -42,26 +42,25 @@ class IpnControllerMembership extends IpnControllerBase
             $result->errors[] = "Form id in request '$formName' does not match form id '".$this->getFormId()."'. Notify webmaster.";
         }
 
-        $result->payer_firstname = $this->getPostValue('first_name','(not found)');
-        $result->payer_lastname = $this->getPostValue('last_name','(not found)');
+        $result->firstname = $this->getPostValue('first_name','(not found)');
+        $result->lastname = $this->getPostValue('last_name','(not found)');
         $result->paypal_txn_id = $this->getPostValue('txn_id','(not found)');
-        $result->membership_type = $this->getPostValue('option_selection1','(not found)');
-        $result->payment_amount = $this->getPostValue('payment_gross');
+        $result->membershiptype = $this->getPostValue('option_selection1','(not found)');
+        $result->amount = $this->getPostValue('payment_gross');
         $result->member_name = array_key_exists('membername',$custom) ? $custom['membername'] : '(not found)';
-        $result->payment_memo = $this->getPostValue('memo');
+        $result->paypalmemo = $this->getPostValue('memo');
 
-        $cost = AftmCatalogManager::GetPrice('membership',$result->membership_type);
-        if (empty($result->payment_amount)) {
+        $cost = AftmCatalogManager::GetPrice('membership',$result->membershiptype);
+        if (empty($result->amount)) {
             $this->addWarning('PayPal did not return payment amound.');
-            $result->payment_amount = '(not found)';
+            $result->amount = '(not found)';
         }
-        else if ($result->payment_amount != $cost) {
-            $this->addWarning( "Cost in catalog ($cost) does not match payment amount ($result->payment_amount)");
+        else if ($result->amount != $cost) {
+            $this->addWarning( "Cost in catalog ($cost) does not match payment amount ($result->amount)");
         }
         $result->cost = $cost;
 
         return $result;
-
     }
 
     /**
@@ -73,17 +72,17 @@ class IpnControllerMembership extends IpnControllerBase
         $name = (isset($membership->member_first_name) ? $membership->member_first_name.' ' : '').
             (isset($membership->member_last_name) ? $membership->member_last_name : '');
         $contactInfo = $mailManager->formatAddressHtml(
-            $membership->member_address1 ,
-            $membership->member_address2 ,
-            $membership->member_city ,
-            $membership->member_state ,
-            $membership->member_zipcode,
+            $membership->address1 ,
+            $membership->address2 ,
+            $membership->city ,
+            $membership->state ,
+            $membership->postalcode,
             $name);
 
         if (!empty($membership->member_band_name)) {
-            $contactInfo .= '<p>Group: '.$membership->member_band_name;
-            if (!empty($membership->member_band_website)) {
-                $contactInfo .= ' ('.$membership->member_band_website.')';
+            $contactInfo .= '<p>Group: '.$membership->groupname;
+            if (!empty($membership->groupwebsite)) {
+                $contactInfo .= ' ('.$membership->groupwebsite.')';
             }
             $contactInfo .= '</p>';
         }
@@ -108,8 +107,8 @@ class IpnControllerMembership extends IpnControllerBase
         $invoiceNumber = $this->getInvoiceNumber();
         $warnings =  $this->getEmailWarnings();
         if (isset($inputs->membership) ) {
-            $membershipType = isset($inputs->membership->membership_type) ? $inputs->membership->membership_type : '(not found)';
-            $email = isset($inputs->membership->member_email) ? $inputs->membership->member_email : '(not found)';
+            $membershipType = isset($inputs->membership->membershiptype) ? $inputs->membership->membershiptype : '(not found)';
+            $email = isset($inputs->membership->email) ? $inputs->membership->email : '(not found)';
             $contactInfo = $this->getContactInfo($mailManager,$inputs->membership);
         }
         else {
@@ -123,14 +122,13 @@ class IpnControllerMembership extends IpnControllerBase
                 'contactInfo' => $contactInfo,
                 'email' => $email,
                 'membership' => $membershipType,
-                // 'membership' => $inputs->request->membership_type,
                 'cost' => $inputs->request->cost,
                 'invoice' => $invoiceNumber,
-                'payorfirst' => $inputs->request->payer_firstname,
-                'payorlast' => $inputs->request->payer_lastname,
+                'payorfirst' => $inputs->request->firstname,
+                'payorlast' => $inputs->request->lastname,
                 'txnid' => $inputs->request->paypal_txn_id,
-                'pmtamount' => $inputs->request->payment_amount,
-                'ppmembership' => $inputs->request->membership_type,
+                'pmtamount' => $inputs->request->amount,
+                'ppmembership' => $inputs->request->membershiptype,
                 'ppmembername' => $inputs->request->member_name,
                 'warnings' => $warnings
             ));
@@ -165,33 +163,13 @@ class IpnControllerMembership extends IpnControllerBase
     {
         if (isset($inputs->invoice) && isset($inputs->invoice->invoicenumber) ) {
             // todo: use database object
-            $entry = AftmMembershipManager::UpdatePayment($inputs->invoice->invoicenumber,$inputs->invoice->cost,$inputs->invoice->payment_memo);
-            if ($entry === false) {
+            $inputs->membership = AftmMembershipManager::UpdatePayment($inputs->invoice->invoicenumber,$inputs->invoice->cost,$inputs->invoice->paypalmemo);
+            if ($inputs->membership === false) {
                 $message = "Warning: No membership entry found for invoice number '$inputs->invoice->invoicenumber'.";
                 $this->addWarning( $message);
                 $this->writeLog($message);
                 return false;
             }
-            $entry = Express::refresh($entry);
-            $membership = new \stdClass();
-            $membership_type             = $entry->getAttributeValueObject('membership_type');
-            $membership->membership_type             = $membership_type->getPlainTextValue();
-            $membership->new_or_renewal              = $entry->getAttribute('new_or_renewal');
-            $membership->member_first_name           = $entry->getAttribute('member_first_name');
-            $membership->member_last_name            = $entry->getAttribute('member_last_name');
-            $membership->member_address1             = $entry->getAttribute('member_address1');
-            $membership->member_address2             = $entry->getAttribute('member_address2');
-            $membership->member_city                 = $entry->getAttribute('member_city');
-            $membership->member_state                = $entry->getAttribute('member_state');
-            $membership->member_zipcode              = $entry->getAttribute('member_postal_code');
-            $membership->member_email                = $entry->getAttribute('member_email');
-            $membership->member_band_name            = $entry->getAttribute('member_band_name');
-            $membership->member_band_website         = $entry->getAttribute('member_band_website');
-            // not used
-            // $membership->payment_method              = $entry->getAttribute('payment_method');
-            // $membership->member_volunteer_interest   = $entry->getAttribute('member_volunteer_interest');
-            // $membership->member_ideas                = $entry->getAttribute('member_ideas');
-            $inputs->membership = $membership;
             return true;
         }
         else {

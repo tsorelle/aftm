@@ -6,7 +6,7 @@
  * Time: 7:59 AM
  */
 
-namespace Application\Aftm\services;
+namespace Application\Aftm\services\donations;
 
 
 use Application\Aftm\AftmDonationManager;
@@ -23,8 +23,9 @@ class InitDonationListCommand extends TServiceCommand
     {
         $result = new \stdClass();
         $result->year = date("Y");
-        $result->yesrlist = AftmDonationManager::GetDonationYearList();
+        $result->yearlist = AftmDonationManager::GetDonationYearList();
         $result->donations = AftmDonationManager::GetDonationList($result->year);
+        $result->canEdit = $this->getUser()->isAuthorized('donations.edit');
         $this->setReturnValue($result);
     }
 }

@@ -2,12 +2,13 @@
 namespace Application\Block\ExternalForm\Form\Controller;
 
 use Application\Aftm\AftmMailManager;
+use Application\Aftm\forms\MembershipFormHelper;
 use Core;
 use Concrete\Core\Controller\AbstractController;
 use Concrete\Core\Http\Request;
 use Application\Aftm\AftmConfiguration;
 use Application\Aftm\AftmInvoiceManager;
-use Application\Aftm\AftmMemberEntityManager;
+use Application\Aftm\AftmMembershipManager;
 use Application\Aftm\PayPalForm;
 use Application\Aftm\AftmCatalogManager;
 use Concrete\Core\Utility\Service\Text;
@@ -23,9 +24,13 @@ use Concrete\Core\Support\Facade\Express;
 class AftmMemberForm extends AbstractController
 {
 
+    /**
+     * @var $helper MembershipFormHelper
+     */
+    private $helper;
+
     // private $showCaptcha = true; // set false for test sessions
     private $showCaptcha = false;
-    private $membershipTypes;
         /* =  array(
         "" => "--- Select ---",
         "Student 1-year" => "Student 1-year - $15.00",
@@ -132,40 +137,6 @@ class AftmMemberForm extends AbstractController
         $this->set('paypalform',$results);
     }
 
-    private function getInvoiceAddress($formData) {
-        $result = '';
-        if (!empty($formData->member_address1)) {
-            $result = $formData->member_address1;
-        }
-        if (!empty($formData->amember_ddress2)) {
-            $result .= (empty($result) ? '' : ',').$formData->member_address2;
-        }
-        $city = trim($formData->member_city.' '.$formData->member_state.' '.$formData->member_zipcode);
-        if (!empty($city)) {
-            $result .= (empty($result) ? '' : ',') . $city;
-        }
-        return $result;
-    }
-
-    private function postInvoice($formData) {
-        $invoiceData = array(
-            'customername'    => $formData->member_first_name.' '.$formData->member_last_name,
-            'customeraddress' => $this->getInvoiceAddress($formData),
-            'customeremail'   => $formData->member_email,
-            'paymentmethod' => $formData->payment_method
-        );
-
-        $invoiceItems = Array (
-            Array(
-                'itemname'  => 'membership',
-                'itemtype'  => $formData->membership_type,
-                'quantity'  => '1',
-                'amount'    => $formData->cost,
-            )
-        );
-        $id = AftmInvoiceManager::Post($invoiceData,$invoiceItems);
-        return $id;
-    }
 
     /**
      * @param $mailManager AftmMailManager
@@ -206,7 +177,7 @@ class AftmMemberForm extends AbstractController
     }
 
     private function getAdditionalInfoSection($formData) {
-        $memberInterests = AftmMemberEntityManager::GetMemberInterests($formData);
+        $memberInterests = AftmMembershipManager::GetMemberInterests($formData);
         if (empty( $formData->member_ideas) && empty($memberInterests) ) {
             return '';
         }
@@ -356,6 +327,7 @@ class AftmMemberForm extends AbstractController
     public function action_submit_member($bID = false)
     {
         if ($this->bID == $bID) {
+            $this->helper = new MembershipFormHelper();
             $this->setDefaults();
             $this->setCaptcha();
             $formData = $this->getRequestValues();
@@ -364,11 +336,7 @@ class AftmMemberForm extends AbstractController
                 $this->set('activepanel','memberform');
                 return false;
             }
-
-            $formData->cost = $this->getCost($formData->membership_type);
-            $formData->invoicenumber = $this->postInvoice($formData);
-            AftmMemberEntityManager::AddMembership($formData);
-
+            $this->helper->AddMembership($formData);
             $memberName = $formData->member_first_name.' '.$formData->member_last_name;
             $formData->memberId = $memberName;
             if ($formData->payment_method == 'paypal') {
@@ -396,24 +364,9 @@ class AftmMemberForm extends AbstractController
         }
     }
 
-    private function getCost($membershipType) {
-        if (!key_exists($membershipType, $this->membershipTypes)) {
-            return false;
-        }
-        $result = $this->membershipTypes[$membershipType];
-        $parts = explode('$',$result);
-        if (sizeof($parts) < 2) {
-            throw new \Exception('Membership description must end with price, proceded by a dollar sign');
-        }
-        return trim($parts[1]);
-    }
 
     private function setDefaults() {
-
-        // Important! values must match those defined in the PayPal hosted form.
-        // See \application\src\aftm\config.ini [form-member] for hosted button id numbers.
-        $this->membershipTypes = AftmCatalogManager::GetSelectList('membership', "--- Select ---");
-        $this->set('membertypes', $this->membershipTypes);
+        $this->set('membertypes', $this->helper->getMembershipTypes());
         $this->set('payoptions',
             array(
                 "paypal" => 'PayPal / Credit Card',

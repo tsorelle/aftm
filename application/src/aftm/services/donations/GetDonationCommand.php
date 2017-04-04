@@ -6,7 +6,7 @@
  * Time: 5:58 PM
  */
 
-namespace Application\Aftm\services;
+namespace Application\Aftm\services\donations;
 
 
 use Application\Aftm\AftmDonationManager;

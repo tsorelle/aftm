@@ -1,6 +1,6 @@
 <?php
 
- namespace Application\Aftm\services;
+ namespace Application\Aftm\services\test;
 
  use Application\Tops\services\TServiceCommand;
 

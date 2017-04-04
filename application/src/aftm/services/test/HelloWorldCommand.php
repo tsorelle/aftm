@@ -6,7 +6,7 @@
  * Time: 1:45 PM
  */
 
-namespace Application\Aftm\services;
+namespace Application\Aftm\services\test;
 
 
 use Application\Tops\services\TServiceCommand;
