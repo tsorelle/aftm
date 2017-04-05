@@ -37,10 +37,11 @@ class TestController extends Controller
         try {
             // call test functions
 
+            $this->emptyTests();
             // $this->donationInitServiceTest();
             // $this->membershipFormTests();
             // $this->donationServicesTest();
-            $this->membershipServicesTest();
+            // $this->membershipServicesTest();
         }
         catch (\Exception $ex) {
             echo "\nFailed ".$ex->getFile()."(".$ex->getLine().") \n";
@@ -53,8 +54,23 @@ class TestController extends Controller
         echo "\nTest Done\n</pre>";
     }
 
-    public function membershipServiceTests() {
+    public function emptyTests() {
+        $t1 = '0 something wrong.';
+        $t2 = '0.39';
+        $t3 = 0.99;
 
+        echo 'PHP Version: '.phpversion()."\n";
+
+
+        echo "thisclass doesn't exist: ".(empty($thisclass) ? 'empty' : 'NOT EMPTY')."\n";
+        echo "thisclass->thismember doesn't exist: ".(empty($thisclass->thismember) ? 'empty' : 'NOT EMPTY')."\n";
+        $thisclass = new \stdClass();
+        echo "thisclass exists but thisclass->thismember doesn't exist: ".(empty($thisclass->thismember) ? 'empty' : 'NOT EMPTY')."\n";
+
+
+        echo "'$t1': ".(empty($t1) ? 'empty' : 'NOT EMPTY')."\n";
+        echo "'$t2': ".(empty($t2) ? 'empty' : 'NOT EMPTY')."\n";
+        echo "'$t3': ".(empty($t3) ? 'empty' : 'NOT EMPTY')."\n";
     }
 
     public function membershipFormTests() {
