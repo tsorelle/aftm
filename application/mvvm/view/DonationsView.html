@@ -1,0 +1,157 @@
+<div id="donations-view-container">
+    <div id="buttons-panel" class="row">
+        <div class="col-md-12">
+            <form>
+                <div class="row">
+                    <div class="col-md-1">
+                        <strong>Year:</strong>
+                    </div>
+                    <div class="col-md-4">
+                        <select data-bind="options: years, value: selectedYear"></select>
+                    </div>
+                    <div class="col-md-7">
+                        <div data-bind="visible:userCanEdit" style="margin-top: 10px">
+                            <a href="#" data-bind="click:createDonation" title="Create new donation record">Add a new&nbsp;Donation</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 20px">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Received</th>
+                        <th>Amount</th>
+                        <th>Donor</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach:donations">
+                    <tr>
+                        <td data-bind="text:donationnumber"></td>
+                        <td data-bind="text:datereceived"></td>
+                        <td data-bind="text:amount"></td>
+                        <td><span data-bind="text:firstname"></span> <span data-bind="text:lastname"></span>
+                        <td data-bind="text:email"></td>
+                        <td data-bind="text:phone"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+
+    <div class="modal" id="meeting-detail-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Donation</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- view form -->
+                    <form data-bind="visible:donationForm.viewState() == 'view'">
+                    </form>
+                    <form data-bind="visible:donationForm.viewState() == 'edit'">
+                        <fieldset >
+                            <legend>Submit Your Donation</legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="" class="control-label">First name<span class="required-field">*</span></label>
+                                        <!-- input here -->
+                                    </div>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="donor_last_name" class="control-label">Last name<span class="required-field">*</span></label>
+                                        <!-- input here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="donor_address1" class="control-label">Address line 1</label>
+                                        <!-- input here -->
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="donor_address2" class="control-label">Address line 2</label>
+                                        <!-- input here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="donor_city" class="control-label">City</label>
+                                        <!-- input here -->
+                                    </div>
+
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="donor_state" class="control-label">State/Province</label>
+                                        <!-- input here -->
+                                    </div>
+
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="" class="control-label">Postal Code</label>
+                                        <!-- input here -->
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="donor_email" class="control-label">Email address</label>
+                                        <!-- input here -->
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="donor_email" class="control-label">Phone number</label>
+                                        <!-- input here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <p>
+                            <span class="required-field">*</span> Indicates required information.
+                        </p>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="" class="control-label">Amount of donation</label>
+                                    <button>Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer"  data-bind="visible:!userCanEdit()">
+                    <a href="#" data-dismiss="modal">Close</a>
+                </div>
+                <div class="modal-footer" data-bind="visible:userCanEdit">
+                    <button type="button" class="btn btn-primary" data-bind="visible:donationForm.viewState() == 'view',click: editDonation">Edit</button>
+                    <button type="button" class="btn btn-default" data-bind="visible:donationForm.viewState() == 'view'" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bind="visible:donationForm.viewState() == 'edit',click: updateDonation">Save changes</button>
+                    <button type="button" data-bind="visible:donationForm.viewState() == 'edit',click:cancelEdit" class="btn btn-default" >
+                        Cancel
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>

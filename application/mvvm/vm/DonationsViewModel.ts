@@ -30,24 +30,83 @@ module Tops {
         paypalmemo : string;
     }
 
-    interface IDonationInitResponse {
-        year: number;
-        yearlist : number[];
+    interface IDonationListResponse {
+        year: string;
+        yearlist : string[];
         donations: IDonationListItem[];
     }
+
+    interface IDonationInitResponse extends IDonationListResponse {
+        canEdit: boolean;
+    }
+
+    export class donationObservable {
+
+        // validation
+        public hasErrors = ko.observable(false);
+        public donationNameError = ko.observable('');
+        public viewState = ko.observable('view');
+
+
+        private clearErrors() {
+            let me = this;
+            me.donationNameError('');
+            me.hasErrors(false);
+        }
+
+        public clear() {
+            let me = this;
+            me.clearErrors();
+        }
+
+        public assign(donation: IDonation) {
+            let me = this;
+            me.clearErrors();
+        }
+
+
+        public validate = ():boolean => {
+            let me = this;
+            me.clearErrors();
+            let valid = true;
+            /*
+             let value = me.meetingName();
+             if (!value) {
+             me.meetingNameError(": Please enter the name of the meeting.");
+             valid = false;
+             }
+             */
+
+            me.hasErrors(!valid);
+            return valid;
+        };
+
+
+        public update(donation: IDonation) {
+            let me = this;
+            // donation.editState = me.donationId() ? editState.updated : editState.created;
+        }
+    }
+
 
     export class DonationsViewModel implements IMainViewModel {
         static instance: Tops.DonationsViewModel;
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
 
+        donationForm = new donationObservable();
         donations = ko.observableArray<IDonationListItem>();
+        years = ko.observableArray<string>();
+        selectedYear = ko.observable('');
+        userCanEdit = ko.observable(false);
+        yearFilter : any = null;
+
 
         // observable declarations here
 
         // Constructor
         constructor() {
-            var me = this;
+            let me = this;
             Tops.DonationsViewModel.instance = me;
             me.application = new Tops.Application(me);
             me.peanut = me.application.peanut;
@@ -64,31 +123,76 @@ module Tops {
          *
          */
         init(successFunction?: () => void) {
-            var me = this;
+            let me = this;
             // setup messaging and other application initializations
             me.application.initialize(
                 function() {
                     // do view model initializations here.
                     me.application.hideServiceMessages();
                     me.application.showWaiter('Getting donation list...');
-                    me.peanut.executeService('InitDonations',null,
+                    me.peanut.executeService('donations\\InitDonationList',null,
                         function(serviceResponse: IServiceResponse) {
                             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                                let response = <IDonationInitResponse>serviceResponse.Value;
-                                me.donations(response.donations);
-                                // todo: set up year list
-
+                                me.userCanEdit(serviceResponse.Value.canEdit);
+                                me.setupLists(serviceResponse.Value);
                                 successFunction();
                             }
                         }
                     ).always(function() {
                         me.application.hideWaiter();
                     });
-
-
                 }
             );
         }
+
+        setupLists = (response : IDonationListResponse) => {
+            let me = this;
+            if (me.yearFilter) {
+                me.yearFilter.dispose();
+            }
+            me.donations(response.donations);
+            response.yearlist.push('All years');
+            me.years(response.yearlist);
+            if (response.year) {
+                me.selectedYear(response.year);
+            }
+            else {
+                me.selectedYear('All years');
+            }
+            me.yearFilter = me.selectedYear.subscribe(me.selectYear);
+        };
+
+        selectYear = (year: string) => {
+            let me = this;
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Getting donation list for '+year+'...');
+            me.peanut.executeService('donations\\GetDonationList',{'year' : year},
+                function(serviceResponse: IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        me.donations(serviceResponse.Value);
+                    }
+                }
+            ).always(function() {
+                me.application.hideWaiter();
+            });
+        };
+
+        createDonation = () => {
+            let me = this;
+            alert('create donation');
+        };
+        editDonation = () => {
+            let me = this;
+            alert('edit donation');
+        };
+        updateDonation = () => {
+            let me = this;
+            alert('update donation');
+        };
+        cancelEdit = () => {
+            let me = this;
+            alert('cancel edit');
+        };
     }
 }
 
