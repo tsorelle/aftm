@@ -44,13 +44,41 @@ module Tops {
 
         // validation
         public hasErrors = ko.observable(false);
-        public donationNameError = ko.observable('');
+        public donationFirstNameError = ko.observable('');
+        public donationLastNameError = ko.observable('');
+        public donationAmountError = ko.observable('');
+        public donationDateError = ko.observable('');
+
+        // state
         public viewState = ko.observable('view');
+        public formTitle = ko.observable('Donation');
+        public activeTab = ko.observable('main');
+
+        // donation properties
+        public id             = ko.observable();
+        public donationnumber = ko.observable('');
+        public datereceived   = ko.observable('');
+        public amount         = ko.observable('');
+        public firstname      = ko.observable('');
+        public lastname       = ko.observable('');
+        public email          = ko.observable('');
+        public phone          = ko.observable('');
+        public address1       = ko.observable('');
+        public address2       = ko.observable('');
+        public city           = ko.observable('');
+        public state          = ko.observable('');
+        public postalcode     = ko.observable('');
+        public notes          = ko.observable('');
+        public paypalmemo     = ko.observable('');
 
 
         private clearErrors() {
             let me = this;
-            me.donationNameError('');
+            me.donationFirstNameError('');
+            me.donationLastNameError('');
+            me.donationAmountError('');
+            me.donationDateError('');
+
             me.hasErrors(false);
         }
 
@@ -61,7 +89,29 @@ module Tops {
 
         public assign(donation: IDonation) {
             let me = this;
+            me.id(donation.id);
+            me.donationnumber(donation.donationnumber);
+            me.datereceived(donation.datereceived);
+            me.amount(donation.amount);
+            me.firstname(donation.firstname);
+            me.lastname(donation.lastname);
+            me.email(donation.email);
+            me.phone(donation.phone);
+            me.address1(donation.address1);
+            me.address2(donation.address2);
+            me.city(donation.city);
+            me.state(donation.state);
+            me.postalcode(donation.postalcode);
+            me.notes(donation.notes);
+            me.paypalmemo(donation.paypalmemo);
             me.clearErrors();
+
+            me.formTitle(
+                (donation.id) ? "Donation #" + donation.donationnumber : "New Donation"
+            );
+
+
+
         }
 
 
@@ -85,6 +135,12 @@ module Tops {
         public update(donation: IDonation) {
             let me = this;
             // donation.editState = me.donationId() ? editState.updated : editState.created;
+        }
+
+        public changeTab = () => {
+            let me = this;
+            let current = me.activeTab();
+            me.activeTab(current == 'notes' ? 'main' : 'notes')
         }
     }
 
@@ -177,13 +233,30 @@ module Tops {
             });
         };
 
+        showDonation = (donation : IDonationListItem) => {
+            let me = this;
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Getting donation #'+donation.donationnumber);
+            me.peanut.executeService('donations\\GetDonation',{'donationId' : donation.id},
+                function(serviceResponse: IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        me.donationForm.assign(serviceResponse.Value);
+                        me.donationForm.viewState('view');
+                        jQuery("#donation-detail-modal").modal('show');
+                    }
+                }
+            ).always(function() {
+                me.application.hideWaiter();
+            });
+
+        };
         createDonation = () => {
             let me = this;
             alert('create donation');
         };
         editDonation = () => {
             let me = this;
-            alert('edit donation');
+            me.donationForm.viewState('edit');
         };
         updateDonation = () => {
             let me = this;
@@ -191,7 +264,12 @@ module Tops {
         };
         cancelEdit = () => {
             let me = this;
-            alert('cancel edit');
+            jQuery("#donation-detail-modal").modal('hide');
+        };
+        deleteDonation  = (donation : IDonationListItem) => {
+            let me = this;
+            let message = (donation) ? 'delete ' + donation.donationnumber : 'delete donation';
+            alert(message);
         };
     }
 }

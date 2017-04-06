@@ -79,6 +79,7 @@ class Controller extends BlockController
         $result->wrapperid = '';
         $result->path = '';
         $result->classname = '';
+        $result->viewfile = '';
 
         if (empty($this->viewmodel)) {
             return $result;
@@ -93,7 +94,7 @@ class Controller extends BlockController
             $location = 'packages/js/vm/'.$parts[0];
             $vm = $parts[1];
         }
-
+        $result->viewfile = $vm.'View.html';
         $parts = explode('/',$vm);
         $len = sizeof($parts);
         $vmcode = $parts[$len - 1];
@@ -123,7 +124,7 @@ class Controller extends BlockController
 
     public function view()
     {
-
+        $vm = $this->getViewModel();
         $c = Page::getCurrentPage();
         if (!$c->isEditMode()) {
             $this->requireAsset('javascript','headjs');
@@ -131,8 +132,21 @@ class Controller extends BlockController
             $this->requireAsset('javascript','topspeanut');
             $this->requireAsset('javascript','topsapp');
 
+            $header = strstr($this->content,'<!-- use view file');
+            if ($header !== false) {
+                $filepath = DIR_APPLICATION.'/mvvm/view/'.$vm->viewfile;
+                $content = @file_get_contents($filepath);
+                if ($content === FALSE) {
+                    $this->content = "<p>Warning: View file not found: $filepath</p>";
+                }
+                else {
+                    $this->content = $content;
+                }
+            }
         }
-        $vm = $this->getViewModel();
+
+
+
 
         $this->set('content', $this->content);
         $this->set('viewcontainerid',$vm->wrapperid);
@@ -165,6 +179,7 @@ class Controller extends BlockController
 
     public function save($data)
     {
+        $content = isset($data['content']) ? $data['content'] : '';
         $args['content'] = isset($data['content']) ? $data['content'] : '';
         $args['viewmodel'] = isset($data['viewmodel']) ? $data['viewmodel'] : '';
         $args['addwrapper'] = isset($data['addwrapper']) ? $data['addwrapper'] : 0;

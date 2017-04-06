@@ -28,7 +28,9 @@ class AftmDonationManager
     public function getDonationById($donationId) {
         $db = \Database::connection();
 
-        $sql = 'SELECT * FROM aftmdonations WHERE id = ?';
+        $sql = 'SELECT id, donationnumber, DATE_FORMAT(datereceived,\'%Y-%m-%d\') AS datereceived,amount,firstname,lastname,email,phone,'.
+            'address1,address2,city,state,postalcode,notes,paypalmemo FROM aftmdonations '.
+            'WHERE id = ?';
         $statement = $db->prepare($sql);
         $statement->bindValue(1, $donationId);
         $statement->execute();
@@ -43,7 +45,10 @@ class AftmDonationManager
     public function getDonationByInvoiceNumber($invoiceNumber) {
         $db = \Database::connection();
 
-        $sql = 'SELECT * FROM aftmdonations WHERE donationnumber = ?';
+        $sql = 'SELECT id, donationnumber, DATE_FORMAT(datereceived,\'%Y-%m-%d\') AS datereceived,amount,firstname,lastname,email,phone,'.
+            'address1,address2,city,state,postalcode,notes,paypalmemo FROM aftmdonations '.
+            'WHERE donationnumber = ?';
+
         $statement = $db->prepare($sql);
         $statement->bindValue(1, $invoiceNumber);
         $statement->execute();
