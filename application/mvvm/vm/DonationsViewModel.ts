@@ -332,6 +332,28 @@ module Tops {
             if (me.donationForm.validate()) {
                 let donation = me.donationForm.getDonation();
                 me.donationsMessage('');
+                let request = {
+                    donation:   me.donationForm.getDonation(),
+                    year: me.selectedYear()
+                };
+
+                me.application.hideServiceMessages();
+                me.application.showWaiter(
+                    donation.id ?
+                    'Updating donation #'+donation.donationnumber :
+                    'Adding donation');
+
+                me.peanut.executeService('donations\\UpdateDonation', request,
+                    function(serviceResponse: IServiceResponse) {
+                        if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                            me.setupLists(serviceResponse.Value);
+                            me.donationForm.viewState('view');
+                        }
+                    }
+                ).always(function() {
+                    me.application.hideWaiter();
+                });
+
                 me.donationForm.viewState('view');
             }
 

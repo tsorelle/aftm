@@ -72,7 +72,7 @@ class UpdateDonationCommand extends TServiceCommand
             return;
         }
         if (!isset($request->donation)) {
-            $this->addErrorMessage('No request received.');
+            $this->addErrorMessage('No donation object received.');
             return;
         }
         $year = (empty($request->year)) ? null : $request->year;
@@ -99,7 +99,7 @@ class UpdateDonationCommand extends TServiceCommand
         }
         $result = new \stdClass();
         $result->donations = AftmDonationManager::GetDonationList($year);
-        $result->yesrlist = AftmDonationManager::GetDonationYearList();
+        $result->yearlist = AftmDonationManager::GetDonationYearList();
         $result->year = $year;
         $this->setReturnValue($result);
     }
