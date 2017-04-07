@@ -83,20 +83,23 @@ class UpdateDonationCommand extends TServiceCommand
         if ($isnew) {
             $request->donation->donationnumber = $this->postInvoice($request->donation);
             AftmDonationManager::NewDonation($request->donation);
-            // if donation year differs from filter, change it to year of new donation
-            if ($year != null) {
-                $year = null;
-                if (!empty($request->donation->datereceived)) {
-                    $time = strtotime($request->donation->datereceived);
-                    if (!empty($time)) {
-                        $year = date("Y", $time);
-                    }
-                }
-            }
+
         }
         else {
             AftmDonationManager::UpdateDonation($request->donation);
         }
+
+        // if donation year differs from filter, change it to year of new donation
+        if ($year != null) {
+            $year = null;
+            if (!empty($request->donation->datereceived)) {
+                $time = strtotime($request->donation->datereceived);
+                if (!empty($time)) {
+                    $year = date("Y", $time);
+                }
+            }
+        }
+
         $result = new \stdClass();
         $result->donations = AftmDonationManager::GetDonationList($year);
         $result->yearlist = AftmDonationManager::GetDonationYearList();

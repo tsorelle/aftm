@@ -131,8 +131,8 @@ module Tops {
 
         public getDonation = () : IDonation => {
             let me = this;
-            let receivedDate = new Date(me.datereceived);
-            let receivedDataString = (receivedDate.toString() == 'Invalid Date') ? '' : receivedDate.toISOString().slice(0, 10);
+            let receivedDate = new Date(me.datereceived());
+            let receivedDateString = (receivedDate.toString() == 'Invalid Date') ? '' : receivedDate.toISOString().slice(0, 10);
 
             let donation : IDonation = {
                 id              : me.id(),
@@ -147,7 +147,7 @@ module Tops {
                 phone           : me.phone(),
                 donationnumber  : me.donationnumber(),
                 amount          : me.amount(),
-                datereceived    : receivedDataString,
+                datereceived    : receivedDateString,
                 notes           : me.notes(),
                 paypalmemo      : me.paypalmemo()
             };
@@ -246,6 +246,14 @@ module Tops {
         init(successFunction?: () => void) {
             let me = this;
             // setup messaging and other application initializations
+            jQuery(function () {
+                jQuery(".datepicker").datepicker(
+                    {
+                        changeYear: true,
+                        yearRange: 'c-20:c+20'
+                    }
+                );
+            });
             me.application.initialize(
                 function() {
                     jQuery("#donations-view-container").hide();
