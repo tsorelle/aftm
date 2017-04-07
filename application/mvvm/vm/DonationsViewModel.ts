@@ -150,12 +150,14 @@ module Tops {
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
 
+        editMode = ko.observable('none');
         donationForm = new donationObservable();
         donations = ko.observableArray<IDonationListItem>();
         years = ko.observableArray<string>();
         selectedYear = ko.observable('');
         userCanEdit = ko.observable(false);
         yearFilter : any = null;
+        donationsMessage = ko.observable('');
 
 
         // observable declarations here
@@ -183,6 +185,7 @@ module Tops {
             // setup messaging and other application initializations
             me.application.initialize(
                 function() {
+                    jQuery("#donations-view-container").hide();
                     // do view model initializations here.
                     me.application.hideServiceMessages();
                     me.application.showWaiter('Getting donation list...');
@@ -196,9 +199,17 @@ module Tops {
                         }
                     ).always(function() {
                         me.application.hideWaiter();
+                        jQuery("#donations-view-container").show();
                     });
                 }
             );
+        }
+
+        setDonationsList(list : IDonationListItem[]) {
+            let me = this;
+            me.donations(list);
+            let message = (list.length > 0) ? '' : 'No donations received for ' + me.selectedYear();
+            me.donationsMessage(message);
         }
 
         setupLists = (response : IDonationListResponse) => {
@@ -206,7 +217,6 @@ module Tops {
             if (me.yearFilter) {
                 me.yearFilter.dispose();
             }
-            me.donations(response.donations);
             response.yearlist.push('All years');
             me.years(response.yearlist);
             if (response.year) {
@@ -215,17 +225,21 @@ module Tops {
             else {
                 me.selectedYear('All years');
             }
+
+            me.setDonationsList(response.donations);
+
             me.yearFilter = me.selectedYear.subscribe(me.selectYear);
         };
 
         selectYear = (year: string) => {
             let me = this;
+            me.donationsMessage('');
             me.application.hideServiceMessages();
             me.application.showWaiter('Getting donation list for '+year+'...');
             me.peanut.executeService('donations\\GetDonationList',{'year' : year},
                 function(serviceResponse: IServiceResponse) {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
-                        me.donations(serviceResponse.Value);
+                        me.setDonationsList(serviceResponse.Value);
                     }
                 }
             ).always(function() {
@@ -250,21 +264,28 @@ module Tops {
             });
 
         };
-        createDonation = () => {
-            let me = this;
-            alert('create donation');
-        };
-        editDonation = () => {
-            let me = this;
-            me.donationForm.viewState('edit');
-        };
         updateDonation = () => {
             let me = this;
-            alert('update donation');
+            me.donationsMessage('');
+            me.donationForm.viewState('view');
+        };
+        createDonation = () => {
+            let me = this;
+            me.donationForm.clear();
+            me.editMode('Add');
+            me.donationForm.formTitle('New Donation');
+            me.donationForm.viewState('edit');
+        };
+
+        editDonation = () => {
+            let me = this;
+            jQuery("#donation-detail-modal").modal('hide');
+            me.editMode('Update');
+            me.donationForm.viewState('edit');
         };
         cancelEdit = () => {
             let me = this;
-            jQuery("#donation-detail-modal").modal('hide');
+            me.donationForm.viewState('view');
         };
         deleteDonation  = (donation : IDonationListItem) => {
             let me = this;

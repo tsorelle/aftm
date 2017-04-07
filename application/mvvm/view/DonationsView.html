@@ -1,53 +1,167 @@
-<div id="donations-view-container">
-    <div id="buttons-panel" class="row">
-        <div class="col-md-12">
-            <form>
+<div id="donations-view-container" style="display: none">
+    <div id="donation-list-panel" data-bind="visible:donationForm.viewState() != 'edit'">
+        <div id="buttons-panel" class="row">
+            <div class="col-md-12">
+                <form>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <strong>Year:</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <select data-bind="options: years, value: selectedYear"></select>
+                        </div>
+                        <div class="col-md-7">
+                            <div data-bind="visible:userCanEdit" style="float: right; padding-top: 2px">
+                                <button class="btn btn-primary btn-xs" data-bind="click:createDonation" title="Create new donation record">Add a new&nbsp;Donation</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 20px">
+            <div class="col-md-12">
+                <p data-bind="visible:donationsMessage,text:donationsMessage"></p>
+                <table class="table table-striped" data-bind="visible:donationsMessage() == ''">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Received</th>
+                            <th>Amount</th>
+                            <th>Donor</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th data-bind="visible:userCanEdit">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach:donations">
+                        <tr>
+                            <td><a href="#" data-bind="click:$parent.showDonation"><span data-bind="text:donationnumber"></span></a></td>
+                            <td data-bind="text:datereceived"></td>
+                            <td data-bind="text:amount"></td>
+                            <td><span data-bind="text:firstname"></span> <span data-bind="text:lastname"></span>
+                            <td data-bind="text:email"></td>
+                            <td data-bind="text:phone"></td>
+                            <td data-bind="visible:$parent.userCanEdit"><a href="#" data-bind="click:$parent.deleteDonation" title="Delete donation record"><i class="fa fa-trash-o"></i></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="donation-update-panel" data-bind="visible:donationForm.viewState() == 'edit'">
+        <h3 class="modal-title" data-bind="text:donationForm.formTitle"></h3>
+        <form >
+            <div class="alert alert-danger" role="alert" data-bind="visible:donationForm.hasErrors">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                Please correct errors before saving.
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="nav nav-tabs">
+                        <li  data-bind="css: {active: donationForm.activeTab() == 'main'}"><a href="#" data-bind="click:donationForm.changeTab">Donation</a></li>
+                        <li  data-bind="css: {active: donationForm.activeTab() == 'notes'}"><a href="#" data-bind="click:donationForm.changeTab">Notes</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <fieldset data-bind="visible: donationForm.activeTab() == 'main'">
                 <div class="row">
-                    <div class="col-md-1">
-                        <strong>Year:</strong>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="amount" class="control-label">Amount of donation</label>
+                            <input class="form-control" id="amount" data-bind="value:donationForm.amount"/>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <select data-bind="options: years, value: selectedYear"></select>
-                    </div>
-                    <div class="col-md-7">
-                        <div data-bind="visible:userCanEdit" style="float: right; padding-top: 2px">
-                            <button class="btn btn-primary btn-xs" data-bind="click:createDonation" title="Create new donation record">Add a new&nbsp;Donation</button>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="donationdate" class="control-label">Date of donation</label>
+                            <input class="form-control" id="donationdate" data-bind="value:donationForm.datereceived"/>
                         </div>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-    <div class="row" style="margin-top: 20px">
-        <div class="col-md-12">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Received</th>
-                        <th>Amount</th>
-                        <th>Donor</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th data-bind="visible:userCanEdit">&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody data-bind="foreach:donations">
-                    <tr>
-                        <td><a href="#" data-bind="click:$parent.showDonation"><span data-bind="text:donationnumber"></span></a></td>
-                        <td data-bind="text:datereceived"></td>
-                        <td data-bind="text:amount"></td>
-                        <td><span data-bind="text:firstname"></span> <span data-bind="text:lastname"></span>
-                        <td data-bind="text:email"></td>
-                        <td data-bind="text:phone"></td>
-                        <td data-bind="visible:$parent.userCanEdit"><a href="#" data-bind="click:$parent.deleteDonation" title="Delete donation record"><i class="fa fa-trash-o"></i></a></td>
-                    </tr>
-                </tbody>
-            </table>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="donor_first_name" class="control-label">First name <span data-bind="text:donationForm.donationFirstNameError"></span></label>
+                            <input class="form-control" id="donor_first_name" data-bind="value:donationForm.firstname"/>
+                        </div>
 
-        </div>
-    </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="donor_last_name" class="control-label">Last name  <span data-bind="text:donationForm.donationLastNameError"></span></label>
+                            <input class="form-control" id="donor_last_name" data-bind="value:donationForm.lastname"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="donor_address1" class="control-label">Address</label>
+                            <input class="form-control" id="donor_address1" data-bind="value:donationForm.address1"/>
+                            <input class="form-control" id="donor_address2" data-bind="value:donationForm.address2"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="donor_city" class="control-label">City</label>
+                            <input class="form-control" id="donor_city" data-bind="value:donationForm.city"/>
+                        </div>
 
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="donor_state" class="control-label">State/Province</label>
+                            <input class="form-control" id="donor_state" data-bind="value:donationForm.state"/>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="postalcode" class="control-label">Postal Code</label>
+                            <input class="form-control" id="postalcode" data-bind="value:donationForm.postalcode"/>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="donor_email" class="control-label">Email address</label>
+                            <input class="form-control" id="donor_email" data-bind="value:donationForm.email"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="donor_phone" class="control-label">Phone number</label>
+                            <input class="form-control" id="donor_phone" data-bind="value:donationForm.phone"/>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset data-bind="visible: donationForm.activeTab() == 'notes'">
+                <legend>Donation notes</legend>
+                <div class="form-group">
+                    <textarea class="form-control" id="donationnotes" data-bind="value:donationForm.notes"></textarea>
+                </div>
+            </fieldset>
+            <div>
+                <button type="button" class="btn btn-primary" data-bind="click:updateDonation">
+                    <span data-bind="text:editMode"></span>
+                </button>
+                <button type="button" class="btn btn-default" data-bind="click:cancelEdit">Cancel</button>
+            </div>
+        </form>
+
+    </div>
 
     <div class="modal" id="donation-detail-modal">
         <div class="modal-dialog">
@@ -82,118 +196,13 @@
                             <p data-bind="text:donationForm.paypalmemo"    ></p>
                         </div>
                     </form>
-                    <form data-bind="visible:donationForm.viewState() == 'edit'">
-                        <div class="alert alert-danger" role="alert" data-bind="visible:donationForm.hasErrors">
-                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                            <span class="sr-only">Error:</span>
-                            Please correct errors before saving.
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <ul class="nav nav-tabs">
-                                    <li  data-bind="css: {active: donationForm.activeTab() == 'main'}"><a href="#" data-bind="click:donationForm.changeTab">Donation</a></li>
-                                    <li  data-bind="css: {active: donationForm.activeTab() == 'notes'}"><a href="#" data-bind="click:donationForm.changeTab">Notes</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <fieldset data-bind="visible: donationForm.activeTab() == 'main'">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="amount" class="control-label">Amount of donation</label>
-                                        <input class="form-control" id="amount" data-bind="value:donationForm.amount"/>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="donationdate" class="control-label">Date of donation</label>
-                                        <input class="form-control" id="donationdate" data-bind="value:donationForm.datereceived"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="donor_first_name" class="control-label">First name <span data-bind="text:donationForm.donationFirstNameError"></span></label>
-                                        <input class="form-control" id="donor_first_name" data-bind="value:donationForm.firstname"/>
-                                    </div>
-
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="donor_last_name" class="control-label">Last name  <span data-bind="text:donationForm.donationLastNameError"></span></label>
-                                        <input class="form-control" id="donor_last_name" data-bind="value:donationForm.lastname"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="donor_address1" class="control-label">Address</label>
-                                        <input class="form-control" id="donor_address1" data-bind="value:donationForm.address1"/>
-                                        <input class="form-control" id="donor_address2" data-bind="value:donationForm.address2"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="donor_city" class="control-label">City</label>
-                                        <input class="form-control" id="donor_city" data-bind="value:donationForm.city"/>
-                                    </div>
-
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="donor_state" class="control-label">State/Province</label>
-                                        <input class="form-control" id="donor_state" data-bind="value:donationForm.state"/>
-                                    </div>
-
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="postalcode" class="control-label">Postal Code</label>
-                                        <input class="form-control" id="postalcode" data-bind="value:donationForm.postalcode"/>
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="donor_email" class="control-label">Email address</label>
-                                        <input class="form-control" id="donor_email" data-bind="value:donationForm.email"/>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="donor_phone" class="control-label">Phone number</label>
-                                        <input class="form-control" id="donor_phone" data-bind="value:donationForm.phone"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <fieldset data-bind="visible: donationForm.activeTab() == 'notes'">
-                            <legend>Donation notes</legend>
-                            <div class="form-group">
-                                <textarea class="form-control" id="donationnotes" data-bind="value:donationForm.notes"></textarea>
-                            </div>
-                        </fieldset>
-                    </form>
                 </div>
                 <div class="modal-footer"  data-bind="visible:!userCanEdit()">
                     <a href="#" data-dismiss="modal">Close</a>
                 </div>
                 <div class="modal-footer" data-bind="visible:userCanEdit">
-                    <button type="button" class="btn btn-primary" data-bind="visible:donationForm.viewState() == 'view',click: editDonation">Edit</button>
-                    <button type="button" class="btn btn-default" data-bind="visible:donationForm.viewState() == 'view'" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-bind="visible:donationForm.viewState() == 'edit',click: updateDonation">Save changes</button>
-                    <button type="button" data-bind="visible:donationForm.viewState() == 'edit',click:cancelEdit" class="btn btn-default" >
-                        Cancel
-                    </button>
+                    <button type="button" class="btn btn-primary" data-bind="click: editDonation">Edit</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
