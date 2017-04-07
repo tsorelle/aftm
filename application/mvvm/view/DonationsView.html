@@ -72,28 +72,28 @@
             <fieldset data-bind="visible: donationForm.activeTab() == 'main'">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="amount" class="control-label">Amount of donation</label>
+                        <div class="form-group" data-bind="css: {'has-error': donationForm.donationAmountError, 'has-feedback' : donationForm.donationAmountError}">
+                            <label for="amount" class="control-label">Amount of donation <span data-bind="text:donationForm.donationAmountError"></span></label>
                             <input class="form-control" id="amount" data-bind="value:donationForm.amount"/>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="donationdate" class="control-label">Date of donation</label>
+                        <div class="form-group" data-bind="css: {'has-error': donationForm.donationDateError, 'has-feedback' : donationForm.donationDateError}">
+                            <label for="donationdate" class="control-label">Date of donation <span data-bind="text:donationForm.donationDateError"></span></label>
                             <input class="form-control" id="donationdate" data-bind="value:donationForm.datereceived"/>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="form-group">
+                        <div class="form-group" data-bind="css: {'has-error': donationForm.donationFirstNameError, 'has-feedback' : donationForm.donationFirstNameError}">
                             <label for="donor_first_name" class="control-label">First name <span data-bind="text:donationForm.donationFirstNameError"></span></label>
                             <input class="form-control" id="donor_first_name" data-bind="value:donationForm.firstname"/>
                         </div>
 
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group">
+                        <div class="form-group"  data-bind="css: {'has-error': donationForm.donationLastNameError, 'has-feedback' : donationForm.donationLastNameError}">
                             <label for="donor_last_name" class="control-label">Last name  <span data-bind="text:donationForm.donationLastNameError"></span></label>
                             <input class="form-control" id="donor_last_name" data-bind="value:donationForm.lastname"/>
                         </div>

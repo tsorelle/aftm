@@ -84,6 +84,21 @@ module Tops {
 
         public clear() {
             let me = this;
+            me.id(0);
+            me.donationnumber('');
+            me.datereceived('');
+            me.amount('');
+            me.firstname('');
+            me.lastname('');
+            me.email('');
+            me.phone('');
+            me.address1('');
+            me.address2('');
+            me.city('');
+            me.state('');
+            me.postalcode('');
+            me.notes('');
+            me.paypalmemo('');
             me.clearErrors();
         }
 
@@ -114,19 +129,67 @@ module Tops {
 
         }
 
+        public getDonation = () : IDonation => {
+            let me = this;
+            let receivedDate = new Date(me.datereceived);
+            let receivedDataString = (receivedDate.toString() == 'Invalid Date') ? '' : receivedDate.toISOString().slice(0, 10);
+
+            let donation : IDonation = {
+                id              : me.id(),
+                firstname       : me.firstname(),
+                lastname        : me.lastname(),
+                address1        : me.address1(),
+                address2        : me.address2(),
+                city            : me.city(),
+                state           : me.state(),
+                postalcode      : me.postalcode(),
+                email           : me.email(),
+                phone           : me.phone(),
+                donationnumber  : me.donationnumber(),
+                amount          : me.amount(),
+                datereceived    : receivedDataString,
+                notes           : me.notes(),
+                paypalmemo      : me.paypalmemo()
+            };
+            return donation;
+        };
+
 
         public validate = ():boolean => {
             let me = this;
             me.clearErrors();
             let valid = true;
-            /*
-             let value = me.meetingName();
-             if (!value) {
-             me.meetingNameError(": Please enter the name of the meeting.");
-             valid = false;
-             }
-             */
+            let value = me.firstname();
+            if (!value) {
+                me.donationFirstNameError(': First and last name are required');
+                valid = false;
+            }
+            value = me.lastname();
+            if (!value) {
+                me.donationLastNameError(': First and last name are required');
+                valid = false;
+            }
 
+            value = me.amount();
+            let n = Number(value);
+            let s = n.toString();
+            if (n.toString() == 'NaN' || n < 0.01) {
+                me.donationAmountError(': An amount greater than zero is required.');
+                valid = false;
+            }
+
+            value = me.datereceived();
+            if (value) {
+                let d = new Date(value);
+                let result = d.toString();
+                if (result == 'Invalid Date') {
+                    me.donationDateError(': This is not a vaild date.')
+                }
+            }
+            else {
+                me.donationDateError(': Please enter date of donation');
+                valid = false;
+            }
             me.hasErrors(!valid);
             return valid;
         };
@@ -266,8 +329,13 @@ module Tops {
         };
         updateDonation = () => {
             let me = this;
-            me.donationsMessage('');
-            me.donationForm.viewState('view');
+            if (me.donationForm.validate()) {
+                let donation = me.donationForm.getDonation();
+                me.donationsMessage('');
+                me.donationForm.viewState('view');
+            }
+
+
         };
         createDonation = () => {
             let me = this;
