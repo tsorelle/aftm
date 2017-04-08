@@ -213,6 +213,7 @@ module Tops {
         private application: Tops.IPeanutClient;
         private peanut: Tops.Peanut;
 
+        private donationDeleteId = 0;
         editMode = ko.observable('none');
         donationForm = new donationObservable();
         donations = ko.observableArray<IDonationListItem>();
@@ -221,6 +222,7 @@ module Tops {
         userCanEdit = ko.observable(false);
         yearFilter : any = null;
         donationsMessage = ko.observable('');
+        confirmDeleteText = ko.observable('');
 
 
         // observable declarations here
@@ -250,6 +252,7 @@ module Tops {
                 jQuery(".datepicker").datepicker(
                     {
                         changeYear: true,
+                        dateFormat: 'yy-mm-dd',
                         yearRange: 'c-20:c+20'
                     }
                 );
@@ -265,7 +268,7 @@ module Tops {
                             if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                                 me.userCanEdit(serviceResponse.Value.canEdit);
                                 me.setupLists(serviceResponse.Value);
-                                successFunction();
+                                me.application.loadComponent('modal-confirm', successFunction);
                             }
                         }
                     ).always(function() {
@@ -385,11 +388,33 @@ module Tops {
             let me = this;
             me.donationForm.viewState('view');
         };
-        deleteDonation  = (donation : IDonationListItem) => {
+
+        confirmDeleteDonation  = (donation : IDonationListItem) => {
             let me = this;
-            let message = (donation) ? 'delete ' + donation.donationnumber : 'delete donation';
-            alert(message);
+            if (donation) {
+                me.donationDeleteId = donation.id;
+                me.confirmDeleteText('Delete donation received on '+donation.datereceived+' from '+donation.firstname+' '+donation.lastname+'?');
+                jQuery("#confirm-delete-modal").modal('show');
+            }
         };
+
+        deleteDonation = () => {
+            let me = this;
+            jQuery("#confirm-delete-modal").modal('hide');
+            let donationId = me.donationDeleteId;
+            me.application.hideServiceMessages();
+            me.application.showWaiter('Deleting donation '+ donationId);
+            me.peanut.executeService('donations\\DeleteDonation',{'donationId' : donationId, 'year' : me.selectedYear()},
+                function(serviceResponse: IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        me.setupLists(serviceResponse.Value);
+                    }
+                }
+            ).always(function() {
+                me.application.hideWaiter();
+            });
+
+        }
     }
 }
 

@@ -136,7 +136,8 @@ class AftmDonationManager
         return $id;
     }
 
-    public function getDonationYears() {
+    public function getDonationYears()
+    {
         $db = \Database::connection();
         $sql = 'SELECT DISTINCT DATE_FORMAT(datereceived,\'%Y\') AS donationyear FROM aftmdonations GROUP BY datereceived DESC';
         $statement = $db->prepare($sql);
@@ -188,6 +189,18 @@ class AftmDonationManager
 
     public static function GetDonationYearList() {
         return self::getInstance()->getDonationYears();
+    }
+
+    public static function GetDonationListAndYears($year=null) {
+        $response = new \stdClass();
+        $response->yearlist = self::getInstance()->getDonationYears();
+        $year = (empty($response->yearlist) || empty($year) || (!is_numeric($year)) ) ? null : $year;
+        if ($year != null && !in_array($year,$response->yearlist)) {
+            $year = $response->yearlist[0];
+        }
+        $response->donations = AftmDonationManager::GetDonationList($year);
+        $response->year = $year;
+        return $response;
     }
 
     public static function GetDonation($donationId) {

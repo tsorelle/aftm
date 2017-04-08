@@ -22,10 +22,11 @@
         <div class="row" style="margin-top: 20px">
             <div class="col-md-12">
                 <p data-bind="visible:donationsMessage,text:donationsMessage"></p>
-                <table class="table table-striped" data-bind="visible:donationsMessage() == ''">
+
+                <table id="large-display-table" class="table table-striped hidden-sm hidden-xs" data-bind="visible:donationsMessage() == ''">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>&nbsp;</th>
                             <th>Received</th>
                             <th>Amount</th>
                             <th>Donor</th>
@@ -36,13 +37,33 @@
                     </thead>
                     <tbody data-bind="foreach:donations">
                         <tr>
-                            <td><a href="#" data-bind="click:$parent.showDonation"><span data-bind="text:donationnumber"></span></a></td>
+                            <td><a href="#" data-bind="click:$parent.showDonation"><i class="fa fa-search-plus" aria-hidden="true"></i>&nbsp;<span style="font-size: small">View</span></a></td>
                             <td data-bind="text:datereceived"></td>
                             <td data-bind="text:amount"></td>
                             <td><span data-bind="text:firstname"></span> <span data-bind="text:lastname"></span>
                             <td data-bind="text:email"></td>
                             <td data-bind="text:phone"></td>
-                            <td data-bind="visible:$parent.userCanEdit"><a href="#" data-bind="click:$parent.deleteDonation" title="Delete donation record"><i class="fa fa-trash-o"></i></a></td>
+                            <td data-bind="visible:$parent.userCanEdit"><a href="#" data-bind="click:$parent.confirmDeleteDonation" title="Delete donation record"><i class="fa fa-trash-o"></i>&nbsp;<span style="font-size: small">Delete</span></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table id="small-display-table" class="table table-striped hidden-lg hidden-md" data-bind="visible:donationsMessage() == ''">
+                    <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Received</th>
+                            <th>Amount</th>
+                            <th>Donor</th>
+                            <th data-bind="visible:userCanEdit">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach:donations">
+                        <tr>
+                            <td><a href="#" data-bind="click:$parent.showDonation"><i class="fa fa-search-plus" aria-hidden="true"></i></a></td>
+                            <td data-bind="text:datereceived"></td>
+                            <td data-bind="text:amount"></td>
+                            <td><span data-bind="text:firstname"></span> <span data-bind="text:lastname"></span>
+                            <td data-bind="visible:$parent.userCanEdit"><a href="#" data-bind="click:$parent.confirmDeleteDonation" title="Delete donation record"><i class="fa fa-trash-o"></i></a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -162,6 +183,8 @@
         </form>
 
     </div>
+
+    <modal-confirm params="id:'confirm-delete-modal',headerText: 'Please confirm delete', bodyText: confirmDeleteText, confirmClick: deleteDonation"></modal-confirm>
 
     <div class="modal" id="donation-detail-modal">
         <div class="modal-dialog">

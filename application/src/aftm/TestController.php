@@ -36,11 +36,11 @@ class TestController extends Controller
 
         try {
             // call test functions
-
-            $this->emptyTests();
+            // $this->getDonationsListAndYearsTest();
+            // $this->emptyTests();
             // $this->donationInitServiceTest();
             // $this->membershipFormTests();
-            // $this->donationServicesTest();
+            $this->donationServicesTest(false);
             // $this->membershipServicesTest();
         }
         catch (\Exception $ex) {
@@ -192,7 +192,7 @@ class TestController extends Controller
 
     }
 
-    public function donationServicesTest()
+    public function donationServicesTest($verbose = false)
     {
         $testval = mktime()." street address";
         $donation = new \stdClass();
@@ -216,7 +216,7 @@ class TestController extends Controller
         $service = new services\donations\UpdateDonationCommand();
         $service->setRequest($donation);
         $result = $service->runTest($request);
-        $this->showServiceResponse($result);
+        $this->showServiceResponse($result, $verbose);
         echo "\nDonation insert complete.\n";
 
         echo "\nStart get test\n";
@@ -224,7 +224,7 @@ class TestController extends Controller
         $request->donationId = $this->getIdValue("select id from aftmdonations where address1 =  '$testval'" );
         $service = new services\donations\GetDonationCommand();
         $response = $service->runTest($request);
-        $this->showServiceResponse($response);
+        $this->showServiceResponse($response, $verbose);
         $donation = $response->Value;
 
         echo "\nCompleted Get test\n";
@@ -239,11 +239,11 @@ class TestController extends Controller
         $service = new services\donations\UpdateDonationCommand();
         $service->setRequest($donation);
         $response = $service->runTest($request);
-        $this->showServiceResponse($response);
-        $message = 'not returned';
-        foreach ($response->Value as $item) {
+        $this->showServiceResponse($response, $verbose);
+        $message = 'Updated value not returned';
+        foreach ($response->Value->donations as $item) {
             if ($item->lastname == $testval) {
-                $message = "Found";
+                $message = "Updated value found";
                 break;
             }
         }
@@ -255,13 +255,19 @@ class TestController extends Controller
         $request->donationId = $donation->id;
         $request->year = 2017;
         $response = $service->runTest($request);
-        $this->showServiceResponse($response);
+        $this->showServiceResponse($response, $verbose);
     }
 
     public function getDonationsYearsTest()
     {
         $years = AftmDonationManager::GetDonationYearList();
         print_r($years);
+    }
+
+    public function getDonationsListAndYearsTest()
+    {
+        $result = AftmDonationManager::GetDonationListAndYears('not a year');
+        var_dump($result);
     }
 
     public function updateDonationTest() {

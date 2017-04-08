@@ -21,10 +21,7 @@ class InitDonationListCommand extends TServiceCommand
 
     protected function run()
     {
-        $result = new \stdClass();
-        $result->year = date("Y");
-        $result->yearlist = AftmDonationManager::GetDonationYearList();
-        $result->donations = AftmDonationManager::GetDonationList($result->year);
+        $result = AftmDonationManager::GetDonationListAndYears(date("Y"));
         $result->canEdit = $this->getUser()->isAuthorized('donations.edit');
         $this->setReturnValue($result);
     }

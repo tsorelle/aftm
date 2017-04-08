@@ -79,16 +79,18 @@ class UpdateDonationCommand extends TServiceCommand
         if ($year != null && !is_numeric($year)) {
             $year = null;
         }
+
+
         $isnew = empty($request->donation->id);
         if ($isnew) {
             $request->donation->donationnumber = $this->postInvoice($request->donation);
             AftmDonationManager::NewDonation($request->donation);
-
+            $this->addInfoMessage('New donation added.');
         }
         else {
             AftmDonationManager::UpdateDonation($request->donation);
+            $this->addInfoMessage('Donation updated.');
         }
-
         // if donation year differs from filter, change it to year of new donation
         if ($year != null) {
             $year = null;
@@ -99,11 +101,7 @@ class UpdateDonationCommand extends TServiceCommand
                 }
             }
         }
-
-        $result = new \stdClass();
-        $result->donations = AftmDonationManager::GetDonationList($year);
-        $result->yearlist = AftmDonationManager::GetDonationYearList();
-        $result->year = $year;
+        $result = AftmDonationManager::GetDonationListAndYears($year);
         $this->setReturnValue($result);
     }
 }

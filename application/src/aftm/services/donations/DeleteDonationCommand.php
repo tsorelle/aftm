@@ -32,15 +32,22 @@ class DeleteDonationCommand extends TServiceCommand
             $this->addErrorMessage('No donation id received.');
             return;
         }
-        $donation = AftmDonationManager::GetDonation($request->donationId);
-        if (!empty($donation->donationnumber)) {
-            AftmInvoiceManager::RemoveInvoice($donation->donationnumber);
-        }
-        AftmDonationManager::RemoveDonation($request->donationId);
         $year = (isset($request->year) && is_numeric($request->year)) ? $request->year : null;
-        $result = AftmDonationManager::GetDonationList($year);
+
+        $donation = AftmDonationManager::GetDonation($request->donationId);
+        if (!empty($donation)) {
+            if (!empty($donation->donationnumber)) {
+                AftmInvoiceManager::RemoveInvoice($donation->donationnumber);
+            }
+            AftmDonationManager::RemoveDonation($request->donationId);
+        }
+
+
+        $result = AftmDonationManager::GetDonationListAndYears($year);
+
         $this->setReturnValue($result);
 
         $this->addInfoMessage('Donation removed.');
+
     }
 }
