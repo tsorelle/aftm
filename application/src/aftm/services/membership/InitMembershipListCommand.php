@@ -21,11 +21,8 @@ class InitMembershipListCommand extends TServiceCommand
 
     protected function run()
     {
-        $result = new \stdClass();
-        $result->year = date("Y");
+        $result = AftmMembershipManager::GetMembershipListAndYears(date("Y"));
         $result->canEdit = $this->getUser()->isAuthorized('memberships.edit');
-        $result->yesrlist = AftmMembershipManager::GetMembershipYearList();
-        $result->memberships = AftmMembershipManager::GetMembershipList($result->year);
         $this->setReturnValue($result);
     }
 }

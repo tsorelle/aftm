@@ -265,4 +265,17 @@ class AftmMembershipManager
         return self::getInstance()->dropMembership($membershipId);
     }
 
+    public static function GetMembershipListAndYears($year=null) {
+        $response = new \stdClass();
+        $response->yearlist = self::getInstance()->getMembershipYears();
+        $year = (empty($response->yearlist) || empty($year) || (!is_numeric($year)) ) ? null : $year;
+        if ($year != null && !in_array($year,$response->yearlist)) {
+            $year = $response->yearlist[0];
+        }
+        $response->memberships = self::GetMembershipList($year);
+        $response->year = $year;
+        return $response;
+    }
+
+
 }

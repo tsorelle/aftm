@@ -118,10 +118,19 @@ class UpdateMembershipCommand  extends TServiceCommand
         else {
             AftmMembershipManager::UpdateMembership($request->membership);
         }
-        $result = new \stdClass();
-        $result->memberships = AftmMembershipManager::GetMembershipList($year);
-        $result->yearlist = AftmMembershipManager::GetMembershipYearList();
-        $result->year = $year;
+
+        // if renewed year differs from filter, change it to year of new membership
+        if ($year != null) {
+            $year = null;
+            if (!empty($request->membership->reneweddate)) {
+                $time = strtotime($request->membership->reneweddate);
+                if (!empty($time)) {
+                    $year = date("Y", $time);
+                }
+            }
+        }
+
+        $result = AftmMembershipManager::GetMembershipListAndYears($year);
         $this->setReturnValue($result);
     }
 }

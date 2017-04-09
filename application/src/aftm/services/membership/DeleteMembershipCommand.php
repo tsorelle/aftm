@@ -31,13 +31,16 @@ class DeleteMembershipCommand extends TServiceCommand
             $this->addErrorMessage('No membership id received.');
             return;
         }
+        $year = (isset($request->year) && is_numeric($request->year)) ? $request->year : null;
+
         $membership = AftmMembershipManager::GetMembership($request->membershipId);
         if (!empty($membership->invoicenumber)) {
             AftmInvoiceManager::RemoveInvoice($membership->invoicenumber);
         }
+
         AftmMembershipManager::RemoveMembership($request->membershipId);
-        $year = (isset($request->year) && is_numeric($request->year)) ? $request->year : null;
-        $result = AftmMembershipManager::GetMembershipList($year);
+
+        $result = AftmMembershipManager::GetMembershipListAndYears($year);
         $this->setReturnValue($result);
 
         $this->addInfoMessage('Membership removed.');

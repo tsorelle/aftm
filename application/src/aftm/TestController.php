@@ -40,8 +40,8 @@ class TestController extends Controller
             // $this->emptyTests();
             // $this->donationInitServiceTest();
             // $this->membershipFormTests();
-            $this->donationServicesTest(false);
-            // $this->membershipServicesTest();
+            // $this->donationServicesTest(false);
+            $this->membershipServicesTest(true);
         }
         catch (\Exception $ex) {
             echo "\nFailed ".$ex->getFile()."(".$ex->getLine().") \n";
@@ -115,7 +115,7 @@ class TestController extends Controller
         echo "\nDonation init complete.\n";
     }
 
-    public function membershipServicesTest() {
+    public function membershipServicesTest($verbose = false) {
         $testval = mktime()." street address";
         $membership = new \stdClass();
         $membership->firstname = 'Still Another New';
@@ -149,7 +149,7 @@ class TestController extends Controller
         $service = new services\membership\UpdateMembershipCommand();
         $service->setRequest($membership);
         $result = $service->runTest($request);
-        $this->showServiceResponse($result);
+        $this->showServiceResponse($result,$verbose);
         echo "\nMembership insert complete.\n";
 
         echo "\nStart get test\n";
@@ -157,7 +157,7 @@ class TestController extends Controller
         $request->membershipId = $this->getIdValue("select id from aftmmemberships where address1 =  '$testval'" );
         $service = new services\membership\GetMembershipCommand();
         $response = $service->runTest($request);
-        $this->showServiceResponse($response);
+        $this->showServiceResponse($response,$verbose);
         $membership = $response->Value;
 
         echo "\nCompleted Get test\n";
@@ -172,7 +172,7 @@ class TestController extends Controller
         $service = new services\membership\UpdateMembershipCommand();
         $service->setRequest($membership);
         $response = $service->runTest($request);
-        $this->showServiceResponse($response);
+        $this->showServiceResponse($response,$verbose);
         $message = 'not returned';
         foreach ($response->Value->memberships as $item) {
             if ($item->lastname == $testval) {
@@ -188,7 +188,7 @@ class TestController extends Controller
         $request->membershipId = $membership->id;
         $request->year = 2017;
         $response = $service->runTest($request);
-        $this->showServiceResponse($response);
+        $this->showServiceResponse($response,$verbose);
 
     }
 
