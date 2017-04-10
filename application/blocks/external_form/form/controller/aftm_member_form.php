@@ -256,7 +256,6 @@ class AftmMemberForm extends AbstractController
         $mailService->setSubject('Welcome to AFTM');
         $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
         $mailService->to($formData->member_email);
-        $mailService->to($formData->member_phone);
         $mailService->sendMail();
 
         // send notification message

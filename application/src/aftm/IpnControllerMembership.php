@@ -80,6 +80,10 @@ class IpnControllerMembership extends IpnControllerBase
             $membership->postalcode,
             $name);
 
+        if (!empty($membership->phone)) {
+            $contactInfo .= '<p>Phone: '.$membership->phone.'</p>';
+        }
+
         if (!empty($membership->groupname)) {
             $contactInfo .= '<p>Group: '.$membership->groupname;
             if (!empty($membership->groupwebsite)) {
