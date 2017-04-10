@@ -101,6 +101,7 @@ class AftmMembershipManager
             'city'  		=> $memberData->member_state,
             'postalcode'  	=> $memberData->member_zipcode,
             'email'  		=> $memberData->member_email,
+            'phone'  		=> $memberData->member_phone,
             'membershiptype' => $memberData->membership_type,
             'startdate'		 => $today,
             'reneweddate'    => $today,
@@ -160,6 +161,7 @@ class AftmMembershipManager
             'city'  		=>        $membershipData->city		,
             'postalcode'  	=>        $membershipData->postalcode	,
             'email'  		=>        $membershipData->email		,
+            'phone'  		=>        $membershipData->phone		,
             'membershiptype' =>       $membershipData->membershiptype,
             'groupname'  	=>        $membershipData->groupname	,
             'groupwebsite'  =>        $membershipData->groupwebsite,
@@ -195,7 +197,7 @@ class AftmMembershipManager
 
     public function getMemberships($year=null) {
         $db = \Database::connection();
-        $sql = 'SELECT id,invoicenumber,DATE_FORMAT(reneweddate,\'%Y-%m-%d\') AS reneweddate, membershiptype,firstname,lastname,email  FROM aftmmemberships';
+        $sql = 'SELECT id,invoicenumber,DATE_FORMAT(reneweddate,\'%Y-%m-%d\') AS reneweddate, membershiptype,firstname,lastname,email,phone  FROM aftmmemberships';
         if ($year) {
             $sql .= " WHERE YEAR(reneweddate) = ? ORDER BY reneweddate,startdate DESC";
             $statement = $db->prepare($sql);

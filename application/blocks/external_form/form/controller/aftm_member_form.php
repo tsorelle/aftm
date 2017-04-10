@@ -29,6 +29,19 @@ class AftmMemberForm extends AbstractController
      */
     private $helper;
 
+    /**
+     * @return MembershipFormHelper
+     */
+    private function getHelper()
+    {
+        if (!isset($this->helper)) {
+            $this->helper = new MembershipFormHelper();
+        }
+        return $this->helper;
+    }
+
+
+
     // private $showCaptcha = true; // set false for test sessions
     private $showCaptcha = false;
         /* =  array(
@@ -63,6 +76,7 @@ class AftmMemberForm extends AbstractController
         $formData->member_city               = $textHelper->sanitize($request->get('member_city'));
         $formData->member_state              = $textHelper->sanitize($request->get('member_state'));
         $formData->member_zipcode            = $textHelper->sanitize($request->get('member_zipcode'));
+        $formData->member_phone              = $textHelper->sanitize($request->get('member_phone'));
         $formData->member_email              = $textHelper->sanitize($request->get('member_email'));
         $formData->membership_type           = $textHelper->sanitize($request->get('membership_type'));
         $formData->member_band_name          = $textHelper->sanitize($request->get('member_band_name'));
@@ -95,6 +109,7 @@ class AftmMemberForm extends AbstractController
         $formData->member_state                = '';
         $formData->member_zipcode              = '';
         $formData->member_email                = '';
+        $formData->member_phone                = '';
         $formData->membership_type             = '';
         $formData->member_band_name            = '';
         $formData->member_band_website         = '';
@@ -150,6 +165,10 @@ class AftmMemberForm extends AbstractController
             $formData->member_city ,
             $formData->member_state ,
             $formData->member_zipcode);
+
+        if (!empty($formData->member_phone)) {
+            $contactInfo .= '<p>Phone: '.$formData->member_phone.'</p>';
+        }
 
         if (!empty($formData->member_band_name)) {
             $contactInfo .= '<p>Group: '.$formData->member_band_name;
@@ -237,6 +256,7 @@ class AftmMemberForm extends AbstractController
         $mailService->setSubject('Welcome to AFTM');
         $mailService->from('atfmtexas@gmail.com', 'Austin Friends of Traditional Music');
         $mailService->to($formData->member_email);
+        $mailService->to($formData->member_phone);
         $mailService->sendMail();
 
         // send notification message
@@ -253,6 +273,7 @@ class AftmMemberForm extends AbstractController
                 'contactInfo' => $contactInfo,
                 'additional' => $additional,
                 'email' => $formData->member_email,
+                'phone' => $formData->member_phone,
                 'invoice' => $formData->invoicenumber,
                 'membership' => $membershipType));
 
@@ -336,7 +357,7 @@ class AftmMemberForm extends AbstractController
                 $this->set('activepanel','memberform');
                 return false;
             }
-            $this->helper->AddMembership($formData);
+            $this->getHelper()->AddMembership($formData);
             $memberName = $formData->member_first_name.' '.$formData->member_last_name;
             $formData->memberId = $memberName;
             if ($formData->payment_method == 'paypal') {
@@ -364,9 +385,9 @@ class AftmMemberForm extends AbstractController
         }
     }
 
-
     private function setDefaults() {
-        $this->set('membertypes', $this->helper->getMembershipTypes());
+
+        $this->set('membertypes', $this->getHelper()->getMembershipTypes());
         $this->set('payoptions',
             array(
                 "paypal" => 'PayPal / Credit Card',

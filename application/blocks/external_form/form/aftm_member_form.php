@@ -97,10 +97,16 @@ if (!empty($errormessage)) {
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <div class="form-group">
                 <label for="member_email" class="control-label">Email address<span class="required-field">*</span></label>
                 <?php echo $form->text('member_email',$formData->member_email)?>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="member_phone" class="control-label">Phone number</label>
+                <?php echo $form->text('member_phone',$formData->member_phone)?>
             </div>
         </div>
     </div>

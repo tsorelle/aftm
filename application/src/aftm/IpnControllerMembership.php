@@ -69,8 +69,9 @@ class IpnControllerMembership extends IpnControllerBase
      * @return string
      */
     private function getContactInfo($mailManager, $membership) {
-        $name = (isset($membership->member_first_name) ? $membership->member_first_name.' ' : '').
-            (isset($membership->member_last_name) ? $membership->member_last_name : '');
+        $name = (isset($membership->firstname) ? $membership->lastname.' ' : '').
+            (isset($membership->lastname) ? $membership->lastname : '');
+
         $contactInfo = $mailManager->formatAddressHtml(
             $membership->address1 ,
             $membership->address2 ,
@@ -79,7 +80,7 @@ class IpnControllerMembership extends IpnControllerBase
             $membership->postalcode,
             $name);
 
-        if (!empty($membership->member_band_name)) {
+        if (!empty($membership->groupname)) {
             $contactInfo .= '<p>Group: '.$membership->groupname;
             if (!empty($membership->groupwebsite)) {
                 $contactInfo .= ' ('.$membership->groupwebsite.')';

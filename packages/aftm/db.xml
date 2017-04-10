@@ -163,7 +163,9 @@
         </field>
         <field name="postalcode" type="string" size="255">
         </field>
-        <field name="email" type="string" size="255">
+        <field name="email" type="string" size="100">
+        </field>
+        <field name="phone" type="string" size="100">
         </field>
         <field name="membershiptype" type="string" size="50">
         </field>

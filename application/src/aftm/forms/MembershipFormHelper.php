@@ -24,6 +24,7 @@ class MembershipFormHelper
 
     public function __construct()
     {
+
         // Important! values must match those defined in the PayPal hosted form.
         // See \application\src\aftm\config.ini [form-member] for hosted button id numbers.
         $this->membershipTypes = AftmCatalogManager::GetSelectList('membership', "--- Select ---");
