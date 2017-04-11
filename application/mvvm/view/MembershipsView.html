@@ -1,0 +1,413 @@
+<div id="memberships-view-container" style="display: none">
+    <div id="membership-list-panel" data-bind="visible:membershipForm.viewState() != 'edit'">
+        <div id="buttons-panel" class="row">
+            <div class="col-md-12">
+                <form>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <strong>Year:</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <select data-bind="options: years, value: selectedYear"></select>
+                        </div>
+                        <div class="col-md-7">
+                            <div data-bind="visible:userCanEdit" style="float: right; padding-top: 2px">
+                                <button class="btn btn-primary btn-xs" data-bind="click:createMembership" title="Create new membership record">Add a new&nbsp;Membership</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 20px">
+            <div class="col-md-12">
+                <p data-bind="visible:membershipsMessage,text:membershipsMessage"></p>
+
+                <table id="large-display-table" class="table table-striped hidden-sm hidden-xs" data-bind="visible:membershipsMessage() == ''">
+                    <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Received</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th data-bind="visible:userCanEdit">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach:memberships">
+                        <tr>
+                            <td><a href="#" data-bind="click:$parent.showMembership"><i class="fa fa-search-plus" aria-hidden="true"></i>&nbsp;<span style="font-size: small">View</span></a></td>
+                            <td data-bind="text:reneweddate"></td>
+                            <td data-bind="text:membershiptype"></td>
+                            <td><span data-bind="text:firstname"></span> <span data-bind="text:lastname"></span>
+                            <td data-bind="text:email"></td>
+                            <td data-bind="text:phone"></td>
+                            <td data-bind="visible:$parent.userCanEdit"><a href="#" data-bind="click:$parent.confirmDeleteMembership" title="Delete membership record"><i class="fa fa-trash-o"></i>&nbsp;<span style="font-size: small">Delete</span></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table id="small-display-table" class="table table-striped hidden-lg hidden-md" data-bind="visible:membershipsMessage() == ''">
+                    <thead>
+                    <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Received</th>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th data-bind="visible:userCanEdit">&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach:memberships">
+                    <tr>
+                        <td><a href="#" data-bind="click:$parent.showMembership"><i class="fa fa-search-plus" aria-hidden="true"></i>&nbsp;<span style="font-size: small">View</span></a></td>
+                        <td data-bind="text:reneweddate"></td>
+                        <td data-bind="text:membershiptype"></td>
+                        <td><span data-bind="text:firstname"></span> <span data-bind="text:lastname"></span>
+                        <td data-bind="text:email"></td>
+                        <td data-bind="text:phone"></td>
+                        <td data-bind="visible:$parent.userCanEdit"><a href="#" data-bind="click:$parent.confirmDeleteMembership" title="Delete membership record"><i class="fa fa-trash-o"></i>&nbsp;<span style="font-size: small">Delete</span></a></td>
+                    </tr>
+                    </tbody>
+
+                    <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Received</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th data-bind="visible:userCanEdit">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach:memberships">
+                        <tr>
+                            <td><a href="#" data-bind="click:$parent.showMembership"><i class="fa fa-search-plus" aria-hidden="true"></i></a></td>
+                            <td data-bind="text:reneweddate"></td>
+                            <td data-bind="text:membershiptype"></td>
+                            <td><span data-bind="text:firstname"></span> <span data-bind="text:lastname"></span>
+                            <td data-bind="visible:$parent.userCanEdit"><a href="#" data-bind="click:$parent.confirmDeleteMembership" title="Delete membership record"><i class="fa fa-trash-o"></i></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="membership-update-panel" data-bind="visible:membershipForm.viewState() == 'edit'">
+        <h3 class="modal-title" data-bind="text:membershipForm.formTitle"></h3>
+        <form >
+            <div class="alert alert-danger" role="alert" data-bind="visible:membershipForm.hasErrors">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                Please correct errors before saving.
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="nav nav-tabs">
+                        <li  data-bind="css: {active: membershipForm.activeTab() == 'main'}"><a href="#" data-bind="click:membershipForm.mainTab">Membership</a></li>
+                        <li  data-bind="css: {active: membershipForm.activeTab() == 'interests'}"><a href="#" data-bind="click:membershipForm.interestsTab">Interests</a></li>
+                        <li  data-bind="css: {active: membershipForm.activeTab() == 'notes'}"><a href="#" data-bind="click:membershipForm.notesTab">Notes</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div data-bind="visible: membershipForm.activeTab() == 'main'">
+                <fieldset >
+                    <legend>Membership</legend>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="membership_type" class="control-label">Membership type</label>
+                                <select class="form-control" id="membership_type"
+                                        data-bind="options:membershipForm.membershiptypes, optionsText: 'Name', value: membershipForm.selectedMembershipType"></select>
+                            </div>
+
+                            <div class="form-group">
+                                <select id="" class="form-control" data-bind="options:membershipForm.renewaltypes,value:membershipForm.neworrenewal"></select>
+                            </div>
+                            <div class="form-group" data-bind="css: {'has-error': membershipForm.membershipDateError, 'has-feedback' :  membershipForm.membershipDateError}">
+                                <label for="reneweddate" class="control-label">Date started or renewed <span data-bind="text:membershipForm.membershipDateError"></span></label>
+                                <input class="form-control datepicker" id="reneweddate" data-bind="value:membershipForm.reneweddate"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" data-bind="css: {'has-error': membershipForm.paymentDateError, 'has-feedback' :  membershipForm.paymentDateError}">
+                                <label for="paymentreceiveddate" class="control-label">Payment received date <span data-bind="text:membershipForm.paymentDateError"></span></label>
+                                <input class="form-control datepicker" id="paymentreceiveddate" data-bind="value:membershipForm.paymentreceiveddate"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="payment_method" class="control-label">Payment method</label>
+                                <select  class="form-control" id="payment_method" data-bind="options:membershipForm.paymentmethods,value:membershipForm.paymentmethod"></select>
+                            </div>
+                            <div class="form-group" data-bind="css: {'has-error': membershipForm.paymentAmountError, 'has-feedback' : membershipForm.paymentAmountError}">
+                                <label for="amount" class="control-label">Amount paid <span data-bind="text:membershipForm.paymentAmountError"></span></label>
+                                <input id="amount"  class="form-control" data-bind="value:membershipForm.amount">
+                            </div>
+                        </div>
+
+
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Member information</legend>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" data-bind="css: {'has-error': membershipForm.membershipFirstNameError, 'has-feedback' : membershipForm.membershipFirstNameError}">
+                                <label for="firstname" class="control-label">First name <span data-bind="text:membershipForm.membershipFirstNameError"></span></label>
+                                <input id="firstname"  class="form-control" data-bind="value:membershipForm.firstname">
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group"  data-bind="css: {'has-error': membershipForm.membershipLastNameError, 'has-feedback' : membershipForm.membershipLastNameError}">
+                                <label for="lastname" class="control-label">Last name  <span data-bind="text:membershipForm.membershipLastNameError"></span></label>
+                                <input id="lastname"  class="form-control" data-bind="value:membershipForm.lastname">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="address1" class="control-label">Address line 1</label>
+                                <input id="address1"  class="form-control" data-bind="value:membershipForm.address1">
+                            </div>
+                            <div class="form-group">
+                                <label for="address2" class="control-label">Address line 2</label>
+                                <input id="address2" class="form-control" data-bind="value:membershipForm.address2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="city" class="control-label">City<span class="required-field">*</span></label>
+                                <input id="city"  class="form-control" data-bind="value:membershipForm.city">
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="state" class="control-label">State/Province<span class="required-field">*</span></label>
+                                <input id="state" class="form-control" data-bind="value:membershipForm.state">
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="postalcode" class="control-label">Postal Code<span class="required-field">*</span></label>
+                                <input id="postalcode" class="form-control" data-bind="value:membershipForm.postalcode">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email" class="control-label">Email address<span class="required-field">*</span></label>
+                                <input id="email" class="form-control" data-bind="value:membershipForm.email">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phone" class="control-label">Phone number</label>
+                                <input id="phone" class="form-control" data-bind="value:membershipForm.phone">
+                            </div>
+                        </div>
+                    </div>
+
+                </fieldset>
+                <fieldset>
+                    <legend>Band or dance group</legend>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="groupname" class="control-label">Group name</label>
+                                <input id="groupname" class="form-control" data-bind="value:membershipForm.groupname">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="groupwebsite" class="control-label">Web site</label>
+                                <input id="groupwebsite" class="form-control" data-bind="value:membershipForm.groupwebsite">
+                            </div>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </div>
+
+            <div data-bind="visible: membershipForm.activeTab() == 'interests'">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="control-label">Volunteer Interests</label>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <!-- check concerts, newsletters -->
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked:membershipForm.concertsInterest"> Concerts
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked:membershipForm.newslettersInterest"> Newsletters
+                                    </label>
+                                </div>
+
+                            </div>
+                            <div class="col-md-3">
+                                <!-- check publicity festivals -->
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked:membershipForm.publicityInterest"> Publicity
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked:membershipForm.festivalsInterest"> Festival
+                                    </label>
+                                </div>
+
+                            </div>
+                            <div class="col-md-3">
+                                <!-- check membeship mailings -->
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked:membershipForm.membershipInterest"> Memberships
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked:membershipForm.mailingsInterest"> Mailings
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <!-- check webpage -->
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked:membershipForm.webpageInterest"> Web Site
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <fieldset>
+                            <legend>Member ideas</legend>
+                            <div class="form-group">
+                                <textarea class="form-control" id="memberideas" data-bind="value:membershipForm.ideas"></textarea>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+
+
+            <div data-bind="visible: membershipForm.activeTab() == 'notes'">
+                <fieldset>
+                    <legend>Membership notes</legend>
+                    <div class="form-group">
+                        <textarea class="form-control" id="membershipnotes" data-bind="value:membershipForm.notes"></textarea>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div>
+                <button type="button" class="btn btn-primary" data-bind="click:updateMembership">
+                    <span data-bind="text:editMode"></span>
+                </button>
+                <button type="button" class="btn btn-default" data-bind="click:cancelEdit">Cancel</button>
+            </div>
+        </form>
+
+    </div>
+
+    <modal-confirm params="id:'confirm-delete-modal',headerText: 'Please confirm delete', bodyText: confirmDeleteText, confirmClick: deleteMembership"></modal-confirm>
+
+    <div class="modal" id="membership-detail-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" data-bind="text:membershipForm.formTitle"></h4>
+                </div>
+                <div class="modal-body">
+                    <!-- view form -->
+                    <form data-bind="visible:membershipForm.viewState() == 'view'">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ul class="nav nav-tabs">
+                                    <li  data-bind="css: {active: membershipForm.viewTab() == 'main'}"><a href="#" data-bind="click:membershipForm.mainViewTab">Membership</a></li>
+                                    <li  data-bind="css: {active: membershipForm.viewTab() == 'interests'}"><a href="#" data-bind="click:membershipForm.interestsViewTab">Interests</a></li>
+                                    <li  data-bind="css: {active: membershipForm.viewTab() == 'notes'}"><a href="#" data-bind="click:membershipForm.notesViewTab">Notes</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div data-bind="visible:membershipForm.viewTab() == 'main'" class="row">
+                            <div class="col-md-12">
+                                <div>
+                                    Membership - <span data-bind="text:membershipForm.membershiptype"></span> (<span data-bind="text:membershipForm.neworrenewal"></span>)
+                                </div>
+                                <div data-bind="visible:membershipForm.amount" style="margin-bottom: 5px">
+                                    $<span data-bind="text:membershipForm.amount"> </span> Received on <span data-bind="text:membershipForm.reneweddate"  ></span></span>
+                                </div>
+
+                                <div><span data-bind="text:membershipForm.firstname"     ></span> <span data-bind="text:membershipForm.lastname"      ></span></div>
+                                <div span data-bind="visible:membershipForm.address1" ><span data-bind="text:membershipForm.address1"      ></span></div>
+                                <div data-bind="visible:membershipForm.address2"><span data-bind="text:membershipForm.address2"      ></span></div>
+                                <div style="margin-bottom: 10px">
+                                    <span data-bind="text:membershipForm.city"          ></span>
+                                    <span data-bind="text:membershipForm.state"         ></span>
+                                    <span data-bind="text:membershipForm.postalcode"    ></span>
+                                </div>
+                                <div data-bind="visible:membershipForm.email"><strong>Email: </strong><span data-bind="text:membershipForm.email"         ></span></div>
+                                <div data-bind="visible:membershipForm.phone"><strong>Phone: </strong><span data-bind="text:membershipForm.phone"         ></span></div>
+                            </div>
+                        </div>
+
+                        <div data-bind="visible:membershipForm.viewTab() == 'interests'" class="row">
+                            <div class="col-md-12">
+                                <div data-bind="visible:membershipForm.volunteerinterests"><strong>Interests: </strong><span data-bind="text:membershipForm.volunteerinterests"         ></span></div>
+                                <div  data-bind="visible:membershipForm.ideas">
+                                    <strong>Ideas (from member):</strong><br>
+                                    <p data-bind="text:membershipForm.ideas"         ></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-bind="visible:membershipForm.viewTab() == 'notes'" class="row">
+                            <div class="col-md-12">
+                                <div  data-bind="visible:membershipForm.notes">
+                                    <strong>Notes:</strong><br>
+                                    <p data-bind="text:membershipForm.notes"         ></p>
+                                </div>
+                                <div data-bind="visible:membershipForm.paypalmemo">
+                                    <strong>PayPal Memo</strong><br>
+                                    <p data-bind="text:membershipForm.paypalmemo"    ></p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer"  data-bind="visible:!userCanEdit()">
+                    <a href="#" data-dismiss="modal">Close</a>
+                </div>
+                <div class="modal-footer" data-bind="visible:userCanEdit">
+                    <button type="button" class="btn btn-primary" data-bind="click: editMembership">Edit</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>

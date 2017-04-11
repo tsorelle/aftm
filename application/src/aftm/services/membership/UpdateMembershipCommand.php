@@ -102,7 +102,7 @@ class UpdateMembershipCommand  extends TServiceCommand
 
         $isnew = empty($request->membership->id);
         if ($isnew) {
-            $request->membership->membershipnumber = $this->postInvoice($request->membership);
+            $request->membership->invoice = $this->postInvoice($request->membership);
             AftmMembershipManager::NewMembership($request->membership);
             // if membership year differs from filter, change it to year of new membership
             if ($year != null) {

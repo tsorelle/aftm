@@ -41,7 +41,8 @@ class TestController extends Controller
             // $this->donationInitServiceTest();
             // $this->membershipFormTests();
             // $this->donationServicesTest(false);
-            $this->membershipServicesTest(true);
+            // $this->membershipServicesTest(true);
+            $this->getMembershipObjectList();
         }
         catch (\Exception $ex) {
             echo "\nFailed ".$ex->getFile()."(".$ex->getLine().") \n";
@@ -126,14 +127,11 @@ class TestController extends Controller
         $membership->state = 'state';
         $membership->postalcode = '19209';
         $membership->email = 'e@mail.com';
-        $membership->startdate = '2017-04-1';
         $membership->notes = 'notes';
         $membership->membershiptype      = 'Individual 5-year';
         $membership->groupname           = '';
         $membership->groupwebsite        = '';
         $membership->volunteerinterests  = 'membership, mailings, webpage';
-        // $membership->reneweddate         = '';
-        // $membership->expirationdate      = '';
         $membership->paymentmethod       = 'paypal';
         // $membership->paymentreceiveddate = '';
         // $membership->invoicenumber       = '';
@@ -394,6 +392,11 @@ class TestController extends Controller
         }
     }
 
+    private function getMembershipObjectList()
+    {
+        $list = AftmCatalogManager::GetObjectList('membership');
+        var_dump($list);
+    }
 
 
 }

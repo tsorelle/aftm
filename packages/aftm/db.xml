@@ -175,11 +175,7 @@
         </field>
         <field name="volunteerinterests" type="string" size="255">
         </field>
-        <field name="startdate" type="datetime">
-        </field>
         <field name="reneweddate" type="datetime">
-        </field>
-        <field name="expirationdate" type="datetime">
         </field>
         <field name="paymentmethod" type="string" size="20">
         </field>

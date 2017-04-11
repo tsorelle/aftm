@@ -103,9 +103,7 @@ class AftmMembershipManager
             'email'  		=> $memberData->member_email,
             'phone'  		=> $memberData->member_phone,
             'membershiptype' => $memberData->membership_type,
-            'startdate'		 => $today,
             'reneweddate'    => $today,
-            'expirationdate' => $expirationDate,
             'groupname'  	=> $memberData->member_band_name,
             'groupwebsite'  => $memberData->member_band_website,
             'volunteerinterests'  => $interests,
@@ -125,7 +123,13 @@ class AftmMembershipManager
     public function getMembershipById($membershipId) {
         $db = \Database::connection();
 
-        $sql = 'SELECT * FROM aftmmemberships WHERE id = ?';
+        $sql = 'SELECT '.
+            'id, firstname, lastname, address1, address2, city, state, postalcode, email,'
+            .'membershiptype, groupname, groupwebsite, volunteerinterests,  paymentmethod,'
+            ."DATE_FORMAT(reneweddate,'%Y-%m-%d') as reneweddate, "
+            ."DATE_FORMAT(paymentreceiveddate,'%Y-%m-%d') as paymentreceiveddate, "
+            .'invoicenumber, neworrenewal, amount, ideas, notes, paypalmemo, phone '
+            .'FROM aftmmemberships WHERE id = ?';
         $statement = $db->prepare($sql);
         $statement->bindValue(1, $membershipId);
         $statement->execute();
@@ -144,12 +148,6 @@ class AftmMembershipManager
         if (empty($membershipData->reneweddate)) {
             $membershipData->reneweddate = $today;
         }
-        if (empty($membershipData->startdate)) {
-            $membershipData->startdate = $membershipData->reneweddate;
-        }
-        $dateParts = explode('-',$membershipData->reneweddate);
-        $dateParts[0] = ($dateParts[0] + $expirationYears);
-        $membershipData->expirationdate = implode('-',$dateParts);
 
         $updateValues = array(
             'firstname'  	=>        $membershipData->firstname	,
@@ -168,10 +166,9 @@ class AftmMembershipManager
             'volunteerinterests'  =>  $membershipData->volunteerinterests,
             'ideas'  		=>        $membershipData->ideas		,
             'notes'  		=>        $membershipData->notes		,
-            'startdate'     =>        $membershipData->startdate,
-            'reneweddate'    =>       $membershipData->reneweddate,
-            'expirationdate' =>       $membershipData->expirationdate,
-            'paymentreceiveddate' =>  $membershipData->paymentreceiveddate
+            'reneweddate'    =>       empty($membershipData->reneweddate) ? null : $membershipData->reneweddate,
+            'paymentreceiveddate' =>  empty($membershipData->paymentreceiveddate) ? null : $membershipData->paymentreceiveddate,
+            'amount' => empty($membershipData->amount) ? null : $membershipData->amount
         );
         return $updateValues;
     }
@@ -199,12 +196,12 @@ class AftmMembershipManager
         $db = \Database::connection();
         $sql = 'SELECT id,invoicenumber,DATE_FORMAT(reneweddate,\'%Y-%m-%d\') AS reneweddate, membershiptype,firstname,lastname,email,phone  FROM aftmmemberships';
         if ($year) {
-            $sql .= " WHERE YEAR(reneweddate) = ? ORDER BY reneweddate,startdate DESC";
+            $sql .= " WHERE YEAR(reneweddate) = ? ORDER BY reneweddate DESC";
             $statement = $db->prepare($sql);
             $statement->bindValue(1, $year);
         }
         else{
-            $sql .= " ORDER BY reneweddate,startdate DESC";
+            $sql .= " ORDER BY reneweddate DESC";
             $statement = $db->prepare($sql);
         }
         $statement->execute();

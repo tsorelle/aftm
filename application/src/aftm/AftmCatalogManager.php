@@ -55,6 +55,20 @@ class AftmCatalogManager
         return $result;
     }
 
+    private function getSelectListObjects($itemname, $valueField = 'itemtype') {
+        $db = \Database::connection();
+
+        $sql = "SELECT itemdescription as Name, $valueField as Value  FROM aftmcatalog WHERE itemname = ? AND active=1 order by displayorder";
+        $statement = $db->prepare($sql);
+        $statement->bindValue(1, $itemname);
+        $statement->execute();
+        $results = $statement->fetchall(PDO::FETCH_OBJ);
+        if ($results === false) {
+            return false;
+        }
+        return $results;
+    }
+
     public static function GetPrice($itemname,$itemtype) {
         return self::getInstance()->getPriceByItemType($itemname,$itemtype);
     }
@@ -65,5 +79,9 @@ class AftmCatalogManager
 
     public static function GetSelectList($itemname,$unassigned=false) {
         return self::getInstance()->getSelectListItems($itemname,$unassigned);
+    }
+
+    public static function GetObjectList($itemname) {
+        return self::getInstance()->getSelectListObjects($itemname);
     }
 }

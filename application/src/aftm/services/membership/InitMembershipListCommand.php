@@ -9,6 +9,7 @@
 namespace Application\Aftm\services\membership;
 
 
+use Application\Aftm\AftmCatalogManager;
 use Application\Aftm\AftmMembershipManager;
 use Application\Tops\services\TServiceCommand;
 
@@ -22,6 +23,8 @@ class InitMembershipListCommand extends TServiceCommand
     protected function run()
     {
         $result = AftmMembershipManager::GetMembershipListAndYears(date("Y"));
+        $types = AftmCatalogManager::GetObjectList('membership');
+        $result->membershiptypes = array_values($types);
         $result->canEdit = $this->getUser()->isAuthorized('memberships.edit');
         $this->setReturnValue($result);
     }

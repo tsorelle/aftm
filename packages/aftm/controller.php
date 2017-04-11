@@ -10,7 +10,7 @@ class Controller extends Package
 
     protected $pkgHandle = 'aftm';
     protected $appVersionRequired = '5.8.1.0';
-    protected $pkgVersion = '1.1.2';
+    protected $pkgVersion = '1.1.3';
 
     public function getPackageDescription()
     {

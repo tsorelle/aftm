@@ -167,7 +167,6 @@ class IpnControllerMembership extends IpnControllerBase
     function updateData($inputs)
     {
         if (isset($inputs->invoice) && isset($inputs->invoice->invoicenumber) ) {
-            // todo: use database object
             $inputs->membership = AftmMembershipManager::UpdatePayment($inputs->invoice->invoicenumber,$inputs->invoice->cost,$inputs->invoice->paypalmemo);
             if ($inputs->membership === false) {
                 $message = "Warning: No membership entry found for invoice number '$inputs->invoice->invoicenumber'.";
