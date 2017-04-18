@@ -189,7 +189,8 @@ class IpnControllerDonation extends IpnControllerBase
     function updateData($inputs)
     {
         if (isset($inputs->invoice) && isset($inputs->invoice->invoicenumber) ) {
-            $entry = AftmDonationManager::UpdatePayment($inputs->invoice->invoicenumber,$inputs->request->payment_amount);
+            $invoicenumber = $inputs->invoice->invoicenumber;
+            $entry = AftmDonationManager::UpdatePayment($invoicenumber,$inputs->request->payment_amount);
             if ($entry === false) {
                 $message = "Warning: No donation entry found for invoice number '$inputs->invoice->invoicenumber'.";
                 $this->addWarning( $message);
@@ -212,7 +213,7 @@ class IpnControllerDonation extends IpnControllerBase
             return true;
         }
         else {
-            $message = "Warning: No donation entry found for invoice number '$inputs->invoice->invoicenumber'.";
+            $message = "Warning: No invoice number received.";
             $this->addWarning($message);
             $this->writeLog($message);
             return false;

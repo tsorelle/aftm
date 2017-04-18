@@ -38,11 +38,11 @@ class TestController extends Controller
             // call test functions
             // $this->getDonationsListAndYearsTest();
             // $this->emptyTests();
-            // $this->donationInitServiceTest();
+            $this->donationInitServiceTest(true);
             // $this->membershipFormTests();
             // $this->donationServicesTest(false);
             // $this->membershipServicesTest(true);
-            $this->getMembershipObjectList();
+            // $this->getMembershipObjectList();
         }
         catch (\Exception $ex) {
             echo "\nFailed ".$ex->getFile()."(".$ex->getLine().") \n";
@@ -108,11 +108,11 @@ class TestController extends Controller
         echo "\nCompleted membership form tests\n";
     }
 
-    public function donationInitServiceTest() {
+    public function donationInitServiceTest($verbose = false) {
         echo "\nDonation init started.\n";
         $service = new services\donations\InitDonationListCommand();
         $response = $service->runTest();
-        $this->showServiceResponse($response);
+        $this->showServiceResponse($response,$verbose);
         echo "\nDonation init complete.\n";
     }
 

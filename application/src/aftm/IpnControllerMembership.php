@@ -167,9 +167,10 @@ class IpnControllerMembership extends IpnControllerBase
     function updateData($inputs)
     {
         if (isset($inputs->invoice) && isset($inputs->invoice->invoicenumber) ) {
-            $inputs->membership = AftmMembershipManager::UpdatePayment($inputs->invoice->invoicenumber,$inputs->invoice->cost,$inputs->invoice->paypalmemo);
+            $invoicenumber = $inputs->invoice->invoicenumber;
+            $inputs->membership = AftmMembershipManager::UpdatePayment($invoicenumber,$inputs->request->cost,$inputs->request->paypalmemo);
             if ($inputs->membership === false) {
-                $message = "Warning: No membership entry found for invoice number '$inputs->invoice->invoicenumber'.";
+                $message = "Warning: No membership entry found for invoice number '$invoicenumber'.";
                 $this->addWarning( $message);
                 $this->writeLog($message);
                 return false;
@@ -177,7 +178,7 @@ class IpnControllerMembership extends IpnControllerBase
             return true;
         }
         else {
-            $message = "Warning: No membership entry found for invoice number '$inputs->invoice->invoicenumber'.";
+            $message = "No invoice information received.";
             $this->addWarning($message);
             $this->writeLog($message);
             return false;

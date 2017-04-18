@@ -132,6 +132,10 @@ class Controller extends BlockController
             $this->requireAsset('javascript','topspeanut');
             $this->requireAsset('javascript','topsapp');
 
+            $this->requireAsset('javascript', 'underscore');
+            $this->requireAsset('css', 'jquery/ui');
+            $this->requireAsset('javascript', 'jquery/ui');
+
             $header = strstr($this->content,'<!-- use view file');
             if ($header !== false) {
                 $filepath = DIR_APPLICATION.'/mvvm/view/'.$vm->viewfile;

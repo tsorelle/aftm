@@ -55,6 +55,7 @@ class Controller extends Package
             array('minify' => false, 'position' =>  \Concrete\Core\Asset\Asset::ASSET_POSITION_HEADER),
             $this
         );
+
     }
 
 
