@@ -25,6 +25,7 @@ module Tops {
 
         // Constructor
         constructor() {
+
             var me = this;
             Tops.NewslettersViewModel.instance = me;
             me.application = new Tops.Application(me);
@@ -34,7 +35,7 @@ module Tops {
         selectFile = (item: IFileItem) => {
             var me = this;
             if (item) {
-                let src = 'http://docs.google.com/viewer?url=' + item.url + '&embedded=true';
+                let src = 'https://docs.google.com/viewer?url=' + item.url + '&embedded=true';
                 me.docUrl(src);
             }
         };
@@ -64,16 +65,17 @@ module Tops {
                     }
                 }
             }).fail(function() {
-                alert('Service Failed');
+                alert('Failed');
             });
         }
 
         /**
+         * @param applicationPath - root path of application or location of service script
          * @param successFunction - page inittializations such as ko.applyBindings() go here.
          *
          * Call this function in a script at the end of the page following the closing "body" tag.
          * e.g.
-         *      ViewModel.init(function() {
+         *      ViewModel.init('/', function() {
          *          ko.applyBindings(ViewModel);
          *      });
          *

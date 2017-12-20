@@ -12,9 +12,9 @@ var Tops;
         Debugging.Switch = function (value) {
             Debugging.isOn = value;
         };
+        Debugging.isOn = true;
         return Debugging;
     }());
-    Debugging.isOn = true;
     Tops.Debugging = Debugging;
 })(Tops || (Tops = {}));
 //# sourceMappingURL=Debugging.js.map

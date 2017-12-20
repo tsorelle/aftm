@@ -38,7 +38,7 @@ class Controller extends Package
 
         $al->register(
             'javascript', 'headjs',
-            'http://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.js',
             // 'js/ko/knockout-3.4.1.js',
             array('local' => false,'minify' => false, 'position' =>  \Concrete\Core\Asset\Asset::ASSET_POSITION_HEADER)
         );
@@ -55,7 +55,6 @@ class Controller extends Package
             array('minify' => false, 'position' =>  \Concrete\Core\Asset\Asset::ASSET_POSITION_HEADER),
             $this
         );
-
     }
 
 
