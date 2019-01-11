@@ -83,24 +83,27 @@ if ($c->isEditMode() && $controller->isBlockEmpty()) {
                  * @var $endDate \DateTime
                  */
                 $endDate = $page->getAttribute('aftm_notice_end_date');
-                $today = new \DateTime();
-                // default timezone is probably UTC, so adjust for Austin, Texas or configured zone
-                $tz = \Application\Tops\sys\TopsConfiguration::getValue('timezone','settings','CST');
-                $today->setTimezone(new \DateTimeZone($tz));
-                if ($today->format('Y-m-d') > $endDate->format('Y-m-d')) {
-                    continue;
+                if ($endDate) {
+                    $today = new \DateTime();
+                    // default timezone is probably UTC, so adjust for Austin, Texas or configured zone
+                    $tz = \Application\Tops\sys\TopsConfiguration::getValue('timezone', 'settings', 'CST');
+                    $today->setTimezone(new \DateTimeZone($tz));
+                    if ($today->format('Y-m-d') > $endDate->format('Y-m-d')) {
+                        continue;
+                    }
                 }
 
                 $topics = $page->getAttribute('aftm_event_topics');
-                $thumbnailClass = 'aftm-eventlist-thumbnail';
+                $thumbnailColumn = 3;
                 if (is_array($topics)) {
                     foreach ($topics as $topic) {
                         if ($topic->treeNodeName == 'Jam') {
-                            $thumbnailClass.='-jams';
+                            $thumbnailColumn = 2;
                             break;
                         }
                     }
                 }
+                $descriptionColumn = 12 - $thumbnailColumn;
 
                 $eventDateValue = $page->getAttribute('aftm_event_date', 'display');
                 $eventLocationValue = $page->getAttribute('aftm_event_location', 'display');
@@ -126,22 +129,34 @@ if ($c->isEditMode() && $controller->isBlockEmpty()) {
                 /* End data preparation. */
 
                 /* The HTML from here through "endforeach" is repeated for every item in the list... */ ?>
+                <div class="row">
 
                 <div class="<?php echo $entryClasses ?>">
 
                     <?php if (is_object($thumbnail)) {
+                        echo "<div class='col-md-$thumbnailColumn'>";
                         ?>
-                        <div class="ccm-block-page-list-page-entry-thumbnail">
+
+                        <!-- div class="ccm-block-page-list-page-entry-thumbnail" -->
                             <?php
                             $img = Core::make('html/image', array($thumbnail));
                             $tag = $img->getTag();
                             $tag->addClass('img-responsive');
                             $tag->addClass('img-thumbnail');
-                            $tag->addClass($thumbnailClass);
-                            echo $tag; ?>
-                        </div>
+                            // $tag->addClass($thumbnailClass);
+                            echo "<a href=".h($url)." target='$target')";
+                            echo $tag.'</a>';
+                            ?>
+                        <!-- /div -->
                         <?php
-                    } ?>
+                        echo '</div>';
+                        echo '<div class="col-md-9">';
+                    }
+                    else {
+                        echo "<div class='col-md-$descriptionColumn'>";
+                    }
+
+                    ?>
 
                     <?php if ($includeEntryText) {
                         ?>
@@ -173,7 +188,9 @@ if ($c->isEditMode() && $controller->isBlockEmpty()) {
                             } ?>
 
                             <p class="aftm-eventlist-detail">
-                                <?php print trim($eventDateValue).', '.$eventLocationValue; ?>
+                                <?php print trim($eventDateValue);?>
+                                <br>
+                                <?php print trim($eventLocationValue);?>
                             </p>
 
                             <?php if (isset($includeDescription) && $includeDescription) {
@@ -195,9 +212,12 @@ if ($c->isEditMode() && $controller->isBlockEmpty()) {
                         <?php
                     } ?>
                 </div>
-
+                </div> <!-- end column -->
+                </div>  <!-- end page row -->
                 <?php
-            } ?>
+            }
+            ?>
+            <!-- end page loop -->
         </div><!-- end .ccm-block-page-list-pages -->
 
         <?php if (count($pages) == 0) { ?>

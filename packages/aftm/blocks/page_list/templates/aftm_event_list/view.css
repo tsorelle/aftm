@@ -28,6 +28,7 @@ div.ccm-block-page-list-page-entry-horizontal div.ccm-block-page-list-page-entry
 div.ccm-block-page-list-page-entry-horizontal div.ccm-block-page-list-page-entry-thumbnail img {
     max-width: none;
 }
+/*
 
 .aftm-eventlist-thumbnail {
     max-width: 240px;
@@ -36,6 +37,7 @@ div.ccm-block-page-list-page-entry-horizontal div.ccm-block-page-list-page-entry
 .aftm-eventlist-thumbnail-jams {
     max-width: 120px;
 }
+*/
 
 
 
@@ -71,4 +73,5 @@ div.ccm-block-page-list-page-entry-read-more {
 .aftm-eventlist-detail {
     font-weight: bold;
     font-size: 1.5rem;
+    color: #8f4300;
 }
