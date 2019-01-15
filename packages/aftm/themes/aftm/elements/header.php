@@ -12,7 +12,7 @@ $displayThirdColumn = $blocks > 0 || $c->isEditMode();
             <div class="col-sm-8" >
                 <div class="row">
                     <div class="col-sm-12" id="logo-col">
-                        <a href=" /"><img src="/packages/aftm/images/aftm-header.png" /></a>
+                        <a href=" /"><img alt="Austin Friends of Traditional Music" src="/packages/aftm/images/aftm-header.png" /></a>
                     </div>
                 </div>
 

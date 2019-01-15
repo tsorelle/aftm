@@ -7,7 +7,7 @@
 ///<reference path='Debugging.ts' />
 var Tops;
 (function (Tops) {
-    var KeyValueDTO = (function () {
+    var KeyValueDTO = /** @class */ (function () {
         function KeyValueDTO() {
         }
         return KeyValueDTO;
@@ -16,7 +16,7 @@ var Tops;
     /**
      * Constants for scym entities editState
      */
-    var editState = (function () {
+    var editState = /** @class */ (function () {
         function editState() {
         }
         editState.unchanged = 0;
@@ -29,7 +29,7 @@ var Tops;
     /**
      * Use for testing. Normally IServiceResponse is returned from a service
      */
-    var fakeServiceResponse = (function () {
+    var fakeServiceResponse = /** @class */ (function () {
         function fakeServiceResponse(returnValue) {
             this.Messages = [];
             this.Result = 0;
@@ -40,7 +40,7 @@ var Tops;
         return fakeServiceResponse;
     }());
     Tops.fakeServiceResponse = fakeServiceResponse;
-    var HttpRequestVars = (function () {
+    var HttpRequestVars = /** @class */ (function () {
         function HttpRequestVars() {
             this.requestVars = [];
             var me = this;
@@ -73,7 +73,7 @@ var Tops;
         return HttpRequestVars;
     }());
     Tops.HttpRequestVars = HttpRequestVars;
-    var Peanut = (function () {
+    var Peanut = /** @class */ (function () {
         function Peanut(clientApp) {
             this.clientApp = clientApp;
             this.securityToken = '';

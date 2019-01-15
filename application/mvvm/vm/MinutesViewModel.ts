@@ -35,7 +35,7 @@ module Tops {
         selectFile = (item: IFileItem) => {
             var me = this;
             if (item) {
-                let src = 'http://docs.google.com/viewer?url=' + item.url + '&embedded=true';
+                let src = 'https://docs.google.com/viewer?url=' + item.url + '&embedded=true';
                 me.docUrl(src);
             }
         };

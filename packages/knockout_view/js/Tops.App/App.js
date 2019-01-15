@@ -14,13 +14,13 @@ var Tops;
     var appRootPath = '/application/mvvm/';
     // see routing declarations in /application/app.php
     var serviceUrlDefault = '/tops/service/execute';
-    var mailBox = (function () {
+    var mailBox = /** @class */ (function () {
         function mailBox() {
         }
         return mailBox;
     }());
     Tops.mailBox = mailBox;
-    var waitMessage = (function () {
+    var waitMessage = /** @class */ (function () {
         function waitMessage() {
         }
         waitMessage.addTemplate = function (templateName, content) {
@@ -75,7 +75,7 @@ var Tops;
         return waitMessage;
     }());
     Tops.waitMessage = waitMessage;
-    var messageManager = (function () {
+    var messageManager = /** @class */ (function () {
         function messageManager() {
             var _this = this;
             this.errorMessages = ko.observableArray([]);
@@ -158,7 +158,7 @@ var Tops;
         return messageManager;
     }());
     // Class
-    var Application = (function () {
+    var Application = /** @class */ (function () {
         function Application(currentViewModel) {
             var _this = this;
             this.siteUrl = '';
@@ -174,7 +174,7 @@ var Tops;
              * @param finalFunction
              */
             this.bindComponent = function (name, vmInstance, // instance of VM or function returning the instance.
-                finalFunction) {
+            finalFunction) {
                 var me = _this;
                 me.usingComponentLoader(function () {
                     if (me.componentLoader.alreadyLoaded(name)) {
@@ -313,7 +313,7 @@ var Tops;
          * @param finalFunction
          */
         Application.prototype.loadComponentInstance = function (name, vmInstance, // instance of VM or function returning the instance.
-            finalFunction) {
+        finalFunction) {
             var me = this;
             me.usingComponentLoader(function () {
                 me.componentLoader.loadComponentInstance(name, vmInstance, finalFunction);

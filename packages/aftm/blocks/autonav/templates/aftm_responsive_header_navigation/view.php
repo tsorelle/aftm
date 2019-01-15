@@ -111,6 +111,22 @@ foreach ($navItems as $ni) {
 echo '<nav class="ccm-responsive-navigation original"><ul>'; //opens the top-level menu
 
 foreach ($navItems as $ni) {
+
+    // display the search menu item on small devices instead of search block
+    //  Search block should use custom classes ' hidden-sm hidden-xm';
+    if  (isset($ni->name)) {
+        if ($ni->name === 'Search') {
+            $ni->classes .= ' hidden-md hidden-lg';
+        }
+//        else if ($ni->name === 'Register or Sign in') {
+//            $u = new User();
+//            if($u->isLoggedIn()) {
+//                $ni->classes .= ' hidden';
+//                // continue;
+//            }
+//        }
+    }
+
     echo '<li class="' . $ni->classes . '">'; //opens a nav item
     $name = (isset($translate) && $translate == true) ? t($ni->name) : $ni->name;
     echo '<a href="' . $ni->url . '" target="' . $ni->target . '" class="' . $ni->classes . '">' . $name . '</a>';

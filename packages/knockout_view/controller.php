@@ -11,6 +11,7 @@ use Database;
 
 class Controller extends Package
 {
+    protected $pkgAutoloaderMapCoreExtensions = true;
     protected $pkgHandle = 'knockout_view';
     protected $appVersionRequired = '5.8.0';
     protected $pkgVersion = '1.1';

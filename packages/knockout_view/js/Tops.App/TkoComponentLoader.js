@@ -6,7 +6,7 @@
 /// <reference path="../../../../application/mvvm/typings/custom/head.load.d.ts" />
 var Tops;
 (function (Tops) {
-    var TkoComponentLoader = (function () {
+    var TkoComponentLoader = /** @class */ (function () {
         function TkoComponentLoader(applicationPath) {
             if (applicationPath === void 0) { applicationPath = ''; }
             this.applicationPath = applicationPath;
@@ -98,7 +98,7 @@ var Tops;
         };
         // load template and register instance. Instance argumnet may be a function returning an instance or the instance itself.
         TkoComponentLoader.prototype.loadComponentInstance = function (name, vmInstance, //  getVmInstance : () => any,
-            finalFunction) {
+        finalFunction) {
             var me = this;
             var fileName = me.nameToFileName(name);
             var htmlPath = me.applicationPath + 'templates/' + fileName + '.html?tv=' + TkoComponentLoader.versionNumber;
@@ -125,5 +125,5 @@ var Tops;
     Tops.TkoComponentLoader = TkoComponentLoader;
 })(Tops || (Tops = {}));
 // Tops.TkoComponentLoader.instance = new Tops.TkoComponentLoader();
-// (<any>window).TkoComponents = Tops.TkoComponentLoader.instance; 
+// (<any>window).TkoComponents = Tops.TkoComponentLoader.instance;
 //# sourceMappingURL=TkoComponentLoader.js.map

@@ -3,7 +3,7 @@
  */
 var Tops;
 (function (Tops) {
-    var Debugging = (function () {
+    var Debugging = /** @class */ (function () {
         function Debugging() {
         }
         Debugging.isEnabled = function () {
